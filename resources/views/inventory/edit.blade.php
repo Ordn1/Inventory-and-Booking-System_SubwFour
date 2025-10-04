@@ -33,7 +33,7 @@
             </div>
             <div class="form-group">
                 <label>Category</label>
-                <select name="itemctgry_id" class="form-input" required>
+                <select name="itemctgry_id" class="form-input" style="width:100%;" required>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->itemctgry_id }}"
                             @selected(old('itemctgry_id',$item->itemctgry_id)==$cat->itemctgry_id)>
@@ -44,7 +44,7 @@
             </div>
             <div class="form-group">
                 <label>Status</label>
-                <select name="active" class="form-input">
+                <select name="active" class="form-input" style="width:100%;" >
                     <option value="1" @selected(old('active',$item->active))>Active</option>
                     <option value="0" @selected(!old('active',$item->active))>Inactive</option>
                 </select>

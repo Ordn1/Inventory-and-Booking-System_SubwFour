@@ -28,19 +28,19 @@
 
 <div class="glass-card glass-card-wide">
     <form id="reportsFilterForm" method="GET"
-        style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:12px;align-items:end;">
+        style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;align-items:end;">
 
         <div>
             <label class="filter-label">From</label>
-            <input type="date" name="date_from" value="{{ $dateFrom }}" class="form-input">
+            <input type="date" name="date_from" value="{{ $dateFrom }}" class="form-input" style="width:100%;">
         </div>
         <div>
             <label class="filter-label">To</label>
-            <input type="date" name="date_to" value="{{ $dateTo }}" class="form-input">
+            <input type="date" name="date_to" value="{{ $dateTo }}" class="form-input" style="width:100%;">
         </div>
         <div>
             <label class="filter-label">User</label>
-            <select name="user_id" class="form-input">
+            <select name="user_id" class="form-input" style="width:100%;">
                 <option value="">All</option>
                 @foreach($users as $u)
                     <option value="{{ $u->id }}" @selected($userId==$u->id)>{{ $u->name }}</option>
@@ -49,18 +49,18 @@
         </div>
         <div>
             <label class="filter-label">Event</label>
-            <select name="event_type" class="form-input">
+            <select name="event_type" class="form-input" style="width:100%;">
                 <option value="">All</option>
                 @foreach($eventTypes as $et)
                     <option value="{{ $et }}" @selected($event===$et)>{{ $et }}</option>
                 @endforeach
             </select>
         </div>
-
-        <!-- Search full width last row -->
-        <div style="grid-column:1 / -1;">
+    </form>
+    <form method="GET" style="margin-bottom:12px;">
+        <div>
             <label class="filter-label">Search</label>
-            <input type="text" name="search" value="{{ $search }}" class="form-input" placeholder="Desc / event / subject id">
+            <input type="text" name="search" value="{{ $search }}" class="form-input" style="width:100%;" placeholder="Desc / event / subject id">
         </div>
     </form>
     <div style="display:flex;gap:10px;margin-bottom:10px;">
