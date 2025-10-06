@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('unit', 30)->nullable();   // e.g. pcs, box
             $table->boolean('active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index('itemctgry_id');
 

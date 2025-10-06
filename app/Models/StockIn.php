@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StockIn extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $table      = 'stock_in';
     protected $primaryKey = 'stockin_id';

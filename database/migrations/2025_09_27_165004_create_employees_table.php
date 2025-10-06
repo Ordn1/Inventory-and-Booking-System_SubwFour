@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('sss_number', 40)->unique();
             $table->string('profile_picture')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['last_name', 'first_name']);
         });

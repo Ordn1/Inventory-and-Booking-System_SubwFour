@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('total_price', 10, 2); // price * quantity
             $table->date('stockin_date');
             $table->timestamps();
+            $table->softDeletes();
 
             // Indexes (FK columns)
             $table->index('item_id');

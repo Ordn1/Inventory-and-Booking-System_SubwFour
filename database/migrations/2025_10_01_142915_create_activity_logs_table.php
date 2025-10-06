@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->json('meta')->nullable();
             $table->timestamp('occurred_at')->index();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['subject_type','subject_id']);
             $table->index(['event_type','occurred_at']);

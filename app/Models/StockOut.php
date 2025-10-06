@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StockOut extends Model
 {
+    use SoftDeletes;
     protected $table = 'stock_out';
     protected $primaryKey = 'stockout_id';
     public $incrementing = false;

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('reference_type')->nullable();
             $table->string('reference_id')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('item_id')->references('item_id')->on('items')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');

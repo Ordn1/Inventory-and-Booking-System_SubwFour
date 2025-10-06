@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->string('status', 30)->default('pending');   // pending | approved | rejected (later)
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index('status');
             $table->index(['preferred_date', 'status']);
