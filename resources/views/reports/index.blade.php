@@ -27,8 +27,8 @@
 </div>
 <div style="margin-bottom:18px;">
     <a href="{{ route('stock_out.index') }}"
-       class="btn btn-primary"
-       style="width:100%;display:flex;justify-content:center;align-items:center;">
+       class="btn btn-secondary"
+       style="width:100%;display:flex;justify-content:center;">
         <i class="bi bi-box-arrow-up"></i> Stock-Out Records
     </a>
 </div>

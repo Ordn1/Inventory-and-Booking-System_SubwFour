@@ -9,6 +9,14 @@
 @section('content')
 <h2 class="text-accent">STOCK-OUT RECORDS</h2>
 
+<div style="margin-bottom:18px;">
+    <a href="{{ route('reports.index') }}"
+       class="btn btn-secondary"
+       style="width:100%;display:flex;justify-content:center;">
+        <i class="bi bi-arrow-90deg-left"></i> Back
+    </a>
+</div>
+
 <div class="glass-card glass-card-wide">
     <div class="table-responsive">
         <table class="table compact">
