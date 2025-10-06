@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Booking;
+use App\Models\StockOut;
 use App\Models\ActivityLog;
 
 class BookingController extends Controller

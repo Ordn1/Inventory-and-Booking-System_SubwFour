@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use App\Models\ItemCategory;
 use App\Models\ActivityLog;
+use App\Models\StockOut;
 use Illuminate\Http\Request;
 
 class ItemController extends Controller

@@ -82,8 +82,8 @@
                     <td>{{ $row->item?->name }}</td>
                     <td>{{ $row->supplier?->name }}</td>
                     <td class="text-end">{{ $row->quantity }}</td>
-                    <td class="text-end">{{ number_format($row->price,2) }}</td>
-                    <td class="text-end">{{ number_format($row->total_price,2) }}</td>
+                    <td class="text-end">₱{{ number_format($row->price,2) }}</td>
+                    <td class="text-end">₱{{ number_format($row->total_price,2) }}</td>
                     <td>{{ \Carbon\Carbon::parse($row->stockin_date)->format('Y-m-d') }}</td>
                 </tr>
             @empty

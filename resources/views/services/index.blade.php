@@ -84,9 +84,9 @@
                         </form>
                     </td>
                     <td class="text-end">{{ $service->items->count() }}</td>
-                    <td class="text-end">{{ number_format($service->subtotal,2) }}</td>
-                    <td class="text-end">{{ number_format($service->labor_fee ?? 0,2) }}</td>
-                    <td class="text-end">{{ number_format($service->total,2) }}</td>
+                    <td class="text-end">₱{{ number_format($service->subtotal,2) }}</td>
+                    <td class="text-end">₱{{ number_format($service->labor_fee ?? 0,2) }}</td>
+                    <td class="text-end">₱{{ number_format($service->total,2) }}</td>
                     <td>{{ $service->started_at? $service->started_at->format('m/d H:i'):'—' }}</td>
                     <td>
                         <div class="d-flex gap-1">
@@ -179,7 +179,7 @@
                         <tfoot>
                         <tr>
                             <td colspan="3" class="text-end" style="font-weight:600;">Subtotal</td>
-                            <td class="text-end"><span id="subtotalDisplay">0.00</span></td>
+                            <td class="text-end">₱<span id="subtotalDisplay">0.00</span></td>
                             <td></td>
                         </tr>
                         </tfoot>
@@ -216,7 +216,7 @@
     </tr>
 </template>
 
-{{-- Service Types Modal (UPDATED: removed description field/column) --}}
+{{-- Service Types Modal --}}
 <div class="modal hidden" id="serviceTypesModal" data-modal>
     <div class="modal-content" style="max-width:780px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">

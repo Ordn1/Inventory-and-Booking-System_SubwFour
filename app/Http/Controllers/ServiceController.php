@@ -8,6 +8,7 @@ use App\Models\ServiceType;
 use App\Models\Booking;
 use App\Models\Item;
 use App\Models\ActivityLog;
+use App\Models\StockOut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -245,6 +246,16 @@ class ServiceController extends Controller
             $item->quantity -= $qty;
             $item->save();
 
+            \App\Models\StockOut::create([
+                'stockout_id'     => $this->nextStockOutId(),
+                'item_id'         => $item->item_id,
+                'user_id'         => auth()->id(),
+                'quantity'        => $qty,
+                'stockout_date'   => now()->toDateString(),
+                'reference_type'  => Service::class,
+                'reference_id'    => $service->id,
+            ]);
+
             $lineItems[] = new ServiceItem([
                 'item_id'    => $item->item_id,
                 'quantity'   => $qty,
@@ -268,5 +279,11 @@ class ServiceController extends Controller
                 $si->item->save();
             }
         }
+    }
+    private function nextStockOutId(): string
+    {
+        $last = \App\Models\StockOut::orderBy('stockout_id','desc')->first();
+        $n = $last ? (int) preg_replace('/\D/','', $last->stockout_id) : 0;
+        return 'SOUT' . str_pad($n + 1, 4, '0', STR_PAD_LEFT);
     }
 }

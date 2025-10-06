@@ -14,6 +14,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\DashboardController; 
 use App\Http\Controllers\ServiceTypeController; 
+use App\Http\Controllers\StockOutController; 
 
 Route::get('/', function () {
     return Auth::check()
@@ -92,4 +93,6 @@ Route::middleware('auth')->group(function () {
 
     // Reports
     Route::get('/reports',                      [ReportsController::class,'index'])->name('reports.index');
+    Route::get('/stock-out',                    [StockOutController::class, 'index'])->name('stock_out.index');
+    Route::get('/stock-out/{stockout}/receipt', [StockOutController::class, 'receipt'])->name('stock_out.receipt');
 });

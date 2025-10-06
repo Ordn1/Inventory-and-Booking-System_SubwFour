@@ -148,6 +148,10 @@
                     <i class="bi bi-list-columns"></i>
                     Reports
                 </a>
+                <a href="{{ route('stock_out.index') }}" class="qa-btn">
+                    <i class="bi bi-box-arrow-up"></i>
+                    Stock-Out
+                </a>
             </div>
         </div>
 

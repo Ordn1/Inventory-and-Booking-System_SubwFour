@@ -25,7 +25,13 @@
         </div>
     </div>
 </div>
-
+<div style="margin-bottom:18px;">
+    <a href="{{ route('stock_out.index') }}"
+       class="btn btn-primary"
+       style="width:100%;display:flex;justify-content:center;align-items:center;">
+        <i class="bi bi-box-arrow-up"></i> Stock-Out Records
+    </a>
+</div>
 <div class="glass-card glass-card-wide">
     <form id="reportsFilterForm" method="GET"
         style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;align-items:end;">

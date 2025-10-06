@@ -109,7 +109,7 @@
                     <td>{{ $item->category?->name ?? '—' }}</td>
                     <td class="text-end">{{ $item->quantity }}</td>
                     <td>{{ $item->unit ?? '—' }}</td>
-                    <td class="text-end">{{ number_format($item->unit_price,2) }}</td>
+                    <td class="text-end">₱{{ number_format($item->unit_price,2) }}</td>
                     <td>
                         <div class="d-flex gap-2">
                             <a href="{{ route('inventory.edit', $item->item_id) }}"
@@ -351,8 +351,6 @@
     document.addEventListener('keydown', e=>{
         if (e.key === 'Escape' && !modal.classList.contains('hidden')) hideModal();
     });
-
-    // Auto open if coming from category operation
     @if(session('showCategoriesModal') || ( $errors->any() && ! (old('_from') === 'createItem') ))
         showModal();
         @if(old('name') && session('showCategoriesModal') && old('itemctgry_id'))
