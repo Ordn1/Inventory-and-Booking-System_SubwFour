@@ -46,7 +46,7 @@
         <span>Welcome, {{ $user->name }}!</span>
         <div class="profile-picture" id="profileTrigger">
             <img src="{{ $user->role === 'employee'
-                ? asset('images/TCEmployeeProfile.png')
+                ? asset('images/EmployeeProfile.png')
                 : asset('images/' . $profilePicture) }}" alt="Profile Picture">
         </div>
 

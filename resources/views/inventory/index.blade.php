@@ -239,7 +239,6 @@
                 <table class="table" style="width:100%;font-size:.65rem;">
                     <thead>
                         <tr>
-                            <th style="width:58px;">ID</th>
                             <th>Name</th>
                             <th style="width:110px;text-align:right;">Actions</th>
                         </tr>
@@ -247,7 +246,6 @@
                     <tbody>
                         @forelse($categories as $cat)
                             <tr data-cat-row data-id="{{ $cat->itemctgry_id }}" data-name="{{ $cat->name }}">
-                                <td>{{ $cat->itemctgry_id }}</td>
                                 <td>{{ $cat->name }}</td>
                                 <td style="text-align:right;">
                                     <button type="button"

@@ -89,6 +89,20 @@
                         <li><i class="bi bi-check-circle-fill"></i> Noise Dampening</li>
                         <li><i class="bi bi-check-circle-fill"></i> OEM Integration</li>
                     </ul>
+                    <div class="hero-carousel" aria-label="Showcase Images">
+                        <div class="carousel-track">
+                            <div class="carousel-slide"><img src="{{ asset('images/Sample1.jpg') }}" alt="Sample 1"></div>
+                            <div class="carousel-slide"><img src="{{ asset('images/Sample2.jpg') }}" alt="Sample 2"></div>
+                            <div class="carousel-slide"><img src="{{ asset('images/Sample3.jpg') }}" alt="Sample 3"></div>
+                            <div class="carousel-slide"><img src="{{ asset('images/Sample4.jpg') }}" alt="Sample 4"></div>
+                            <div class="carousel-slide"><img src="{{ asset('images/Sample5.jpg') }}" alt="Sample 5"></div>
+                            <div class="carousel-slide"><img src="{{ asset('images/Sample1.jpg') }}" alt="Sample 1"></div>
+                            <div class="carousel-slide"><img src="{{ asset('images/Sample2.jpg') }}" alt="Sample 2"></div>
+                            <div class="carousel-slide"><img src="{{ asset('images/Sample3.jpg') }}" alt="Sample 3"></div>
+                            <div class="carousel-slide"><img src="{{ asset('images/Sample4.jpg') }}" alt="Sample 4"></div>
+                            <div class="carousel-slide"><img src="{{ asset('images/Sample5.jpg') }}" alt="Sample 5"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

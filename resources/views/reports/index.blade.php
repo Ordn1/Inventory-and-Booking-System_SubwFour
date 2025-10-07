@@ -104,7 +104,7 @@
                             —
                         @endif
                     </td>
-                    <td style="max-width:240px;">{{ $log->description }}</td>
+                    <td style="max-width:240px;text-align:left;">{{ $log->description }}</td>
                     </td>
                 </tr>
             @empty

@@ -248,7 +248,6 @@
                 <table class="table" style="width:100%;font-size:.65rem;">
                     <thead>
                         <tr>
-                            <th style="width:60px;">ID</th>
                             <th>Name</th>
                             <th style="width:120px;text-align:right;">Actions</th>
                         </tr>
@@ -256,9 +255,7 @@
                     <tbody>
                         @forelse(($serviceTypes ?? []) as $st)
                             <tr data-st-row
-                                data-id="{{ $st->id }}"
                                 data-name="{{ $st->name }}">
-                                <td>{{ $st->id }}</td>
                                 <td>{{ $st->name }}</td>
                                 <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end;">
                                     <button type="button"
