@@ -29,10 +29,9 @@ class Supplier extends Model
     protected static function booted()
     {
         static::creating(function ($supplier) {
-            // Only generate if not provided (avoid double logic with controller)
             if (empty($supplier->supplier_id)) {
-                $last = Supplier::orderBy('supplier_id','desc')->first();
-                $n    = $last ? (int) substr($last->supplier_id,1) : 0;
+                $last = Supplier::withTrashed()->orderBy('supplier_id','desc')->first();
+                $n    = $last ? (int) preg_replace('/\D/','', $last->supplier_id) : 0;
                 $supplier->supplier_id = 'S'.str_pad($n+1,3,'0',STR_PAD_LEFT);
             }
         });

@@ -29,7 +29,7 @@ class ItemController extends Controller
         }
 
         $items      = $query->orderBy('name')->paginate(10);
-        $categories = ItemCategory::orderBy('name')->get(); // also used in modal
+        $categories = ItemCategory::orderBy('name')->get(); 
 
         return view('inventory.index', compact('items','categories'));
     }
@@ -128,7 +128,7 @@ class ItemController extends Controller
 
     private function nextItemId(): string
     {
-        $last = Item::orderBy('item_id','desc')->first();
+        $last = Item::withTrashed()->orderBy('item_id','desc')->first();
         $n = $last ? (int) preg_replace('/\D/','', $last->item_id) : 0;
         return 'ITM' . str_pad($n + 1, 4, '0', STR_PAD_LEFT);
     }

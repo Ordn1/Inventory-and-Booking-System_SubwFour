@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\User;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -61,7 +62,7 @@ class EmployeeController extends Controller
                 ? $request->file('profile_picture')->store('employee_profiles','public')
                 : null;
 
-            Employee::create([
+            $employee = Employee::create([
                 'user_id'        => $user->id,
                 'first_name'     => $data['first_name'],
                 'last_name'      => $data['last_name'],
@@ -70,6 +71,13 @@ class EmployeeController extends Controller
                 'sss_number'     => $data['sss_number'],
                 'profile_picture'=> $profilePath,
             ]);
+
+            ActivityLog::record(
+                'employee.created',
+                $employee,
+                'Employee created: '.$employee->first_name.' '.$employee->last_name,
+                ['employee_id' => $employee->id, 'user_id' => $user->id]
+            );
         });
 
         return redirect()->route('employees.index')->with('success','Employee created.');
@@ -120,6 +128,13 @@ class EmployeeController extends Controller
                 'contact_number' => $data['contact_number'],
                 'sss_number'     => $data['sss_number'],
             ]);
+
+            ActivityLog::record(
+                'employee.updated',
+                $employee,
+                'Employee updated: '.$employee->first_name.' '.$employee->last_name,
+                ['employee_id' => $employee->id]
+            );
         });
 
         return redirect()->route('employees.edit',$employee->id)->with('success','Employee updated.');
@@ -140,8 +155,64 @@ class EmployeeController extends Controller
             if ($user && $user->role === 'employee') {
                 $user->delete();
             }
+
+            ActivityLog::record(
+                'employee.archived',
+                $employee,
+                'Employee archived: '.$employee->first_name.' '.$employee->last_name,
+                ['employee_id' => $employee->id, 'user_id' => $user?->id]
+            );
         });
 
         return redirect()->route('employees.index')->with('success','Employee deleted.');
+    }
+
+    // restore a soft-deleted employee (and its user if applicable)
+    public function restore($id)
+    {
+        $employee = Employee::withTrashed()->where('id', $id)->firstOrFail();
+        $user = $employee->user()->withTrashed()->first();
+
+        DB::transaction(function () use ($employee, $user) {
+            if ($employee->trashed()) $employee->restore();
+            if ($user && method_exists($user, 'restore') && $user->trashed()) $user->restore();
+
+            ActivityLog::record(
+                'employee.restored',
+                $employee,
+                'Employee restored: '.$employee->first_name.' '.$employee->last_name,
+                ['employee_id' => $employee->id, 'user_id' => $user?->id]
+            );
+        });
+
+        return redirect()->route('employees.index')->with('success','Employee restored.');
+    }
+
+    // permanently delete an employee and its user
+    public function forceDelete($id)
+    {
+        $employee = Employee::withTrashed()->where('id', $id)->firstOrFail();
+        $user = $employee->user()->withTrashed()->first();
+
+        if ($employee->profile_picture && Storage::disk('public')->exists($employee->profile_picture)) {
+            Storage::disk('public')->delete($employee->profile_picture);
+        }
+
+        DB::transaction(function () use ($employee, $user) {
+            $name = $employee->first_name.' '.$employee->last_name;
+            if ($user && $user->role === 'employee' && method_exists($user, 'forceDelete')) {
+                $user->forceDelete();
+            }
+            $employee->forceDelete();
+
+            ActivityLog::record(
+                'employee.permanently_deleted',
+                null,
+                'Employee permanently deleted: '.$name,
+                ['employee_id' => $employee->id]
+            );
+        });
+
+        return redirect()->route('employees.index')->with('success','Employee permanently deleted.');
     }
 }

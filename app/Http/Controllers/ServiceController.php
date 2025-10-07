@@ -58,7 +58,6 @@ class ServiceController extends Controller
 
             $this->syncItemsAndTotals($service, $validated['items']);
 
-            // Log service creation
             ActivityLog::record(
                 'service.created',
                 $service,
@@ -97,7 +96,6 @@ class ServiceController extends Controller
             $service->items()->delete();
             $this->syncItemsAndTotals($service, $validated['items']);
 
-            // Log service update
             ActivityLog::record(
                 'service.updated',
                 $service,
@@ -112,6 +110,14 @@ class ServiceController extends Controller
 
     public function updateStatus(Request $request, Service $service)
     {
+        // NEW GUARD: prevent further changes if already completed or cancelled
+        if (in_array($service->status, [
+            Service::STATUS_COMPLETED,
+            Service::STATUS_CANCELLED
+        ], true)) {
+            return back()->withErrors('This service is finalized and its status can no longer be changed.');
+        }
+
         $request->validate([
             'status' => ['required', Rule::in([
                 Service::STATUS_PENDING,
@@ -125,6 +131,7 @@ class ServiceController extends Controller
             $new = $request->status;
 
             if ($new === Service::STATUS_CANCELLED && $service->status !== Service::STATUS_CANCELLED) {
+                // Return items to inventory
                 $this->restoreInventory($service);
             }
 
@@ -136,6 +143,7 @@ class ServiceController extends Controller
                 $service->started_at = now();
             }
 
+            $old = $service->status;
             $service->status = $new;
             $service->save();
 
@@ -143,7 +151,43 @@ class ServiceController extends Controller
                 $service->booking->update(['status' => 'completed']);
             }
 
-            // --- ACTIVITY LOGGING ---
+            if ($new === Service::STATUS_CANCELLED && $service->booking) {
+                $service->booking->update(['status' => 'rejected']);
+
+                ActivityLog::record(
+                    'booking.rejected',
+                    $service->booking,
+                    'Booking rejected due to service cancellation',
+                    [
+                        'booking_id'     => $service->booking->booking_id,
+                        'service_id'     => $service->id,
+                        'service_status' => $new
+                    ]
+                );
+
+                // Log returned items (they were already restored)
+                $service->loadMissing('items.item');
+                $returned = [];
+                foreach ($service->items as $si) {
+                    $returned[] = [
+                        'item_id' => $si->item_id,
+                        'name'    => optional($si->item)->name,
+                        'qty'     => (int)$si->quantity
+                    ];
+                }
+                if ($returned) {
+                    ActivityLog::record(
+                        'service.items.returned',
+                        $service,
+                        'Service cancellation returned items to inventory',
+                        [
+                            'service_id' => $service->id,
+                            'items'      => $returned
+                        ]
+                    );
+                }
+            }
+
             ActivityLog::record(
                 'service.status_changed',
                 $service,
@@ -174,7 +218,6 @@ class ServiceController extends Controller
                     );
                 }
             }
-            // --- END ACTIVITY LOGGING ---
         });
 
         return back()->with('success','Status updated.');
@@ -198,8 +241,6 @@ class ServiceController extends Controller
     private function sanitizeItems(Request $request): void
     {
         $rows = $request->input('items', []);
-
-        // Normalize: accept rows even if quantity missing (default 1)
         $filtered = [];
         foreach ($rows as $row) {
             if (!isset($row['item_id']) || $row['item_id'] === '') {
@@ -280,6 +321,7 @@ class ServiceController extends Controller
             }
         }
     }
+
     private function nextStockOutId(): string
     {
         $last = \App\Models\StockOut::orderBy('stockout_id','desc')->first();

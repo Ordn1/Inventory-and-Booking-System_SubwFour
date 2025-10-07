@@ -11,16 +11,17 @@ class SupplierController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+
         $suppliers = Supplier::when($search, function ($query, $search) {
-            return $query->where(function($q) use ($search) {
-                $q->where('name','like',"%{$search}%")
-                  ->orWhere('address','like',"%{$search}%")
-                  ->orWhere('number','like',"%{$search}%")
-                  ->orWhere('contact_person','like',"%{$search}%");
-            });
-        })
-        ->orderBy('supplier_id')
-        ->get();
+                $query->where(function($q) use ($search) {
+                    $q->where('name','like',"%{$search}%")
+                      ->orWhere('address','like',"%{$search}%")
+                      ->orWhere('number','like',"%{$search}%")
+                      ->orWhere('contact_person','like',"%{$search}%");
+                });
+            })
+            ->orderBy('supplier_id')
+            ->get(); // soft deleted excluded by default
 
         return view('suppliers.index', compact('suppliers'));
     }
@@ -34,11 +35,13 @@ class SupplierController extends Controller
         ActivityLog::record(
             'supplier.created',
             $supplier,
-            'Added new supplier: '.$supplier->name,
-            ['name' => $supplier->name]
+            'Added supplier: '.$supplier->name,
+            ['supplier_id' => $supplier->supplier_id, 'name' => $supplier->name]
         );
 
-        return redirect()->route('suppliers.index')->with('success','Supplier added successfully!');
+        return redirect()
+            ->route('suppliers.index')
+            ->with('success','Supplier added successfully!');
     }
 
     public function edit($supplier_id)
@@ -55,7 +58,7 @@ class SupplierController extends Controller
             'name'           => 'required|string|max:255|unique:suppliers,name,'.$supplier->supplier_id.',supplier_id',
             'address'        => 'required|string|max:255|unique:suppliers,address,'.$supplier->supplier_id.',supplier_id',
             'number'         => 'required|string|max:15|unique:suppliers,number,'.$supplier->supplier_id.',supplier_id',
-            'contact_person' => 'required|string|max:255|unique:suppliers,contact_person,' .$supplier->supplier_id.',supplier_id',
+            'contact_person' => 'required|string|max:255|unique:suppliers,contact_person,'.$supplier->supplier_id.',supplier_id',
         ]);
 
         $supplier->update($validated);
@@ -64,25 +67,68 @@ class SupplierController extends Controller
             'supplier.updated',
             $supplier,
             'Updated supplier: '.$supplier->name,
-            ['name' => $supplier->name]
+            ['supplier_id' => $supplier->supplier_id]
         );
 
-        return redirect()->route('suppliers.index')->with('success','Supplier updated successfully!');
+        return redirect()
+            ->route('suppliers.index')
+            ->with('success','Supplier updated successfully!');
     }
 
     public function destroy($supplier_id)
     {
         $supplier = Supplier::where('supplier_id',$supplier_id)->firstOrFail();
-        $name = $supplier->name;
-        $supplier->delete();
+        $supplier->delete(); // soft delete
 
         ActivityLog::record(
-            'supplier.deleted',
-            null,
-            'Deleted supplier: '.$name,
-            ['name' => $name]
+            'supplier.archived',
+            $supplier,
+            'Archived supplier: '.$supplier->name,
+            ['supplier_id' => $supplier->supplier_id]
         );
 
-        return redirect()->route('suppliers.index')->with('success','Supplier deleted successfully!');
+        return redirect()
+            ->route('suppliers.index')
+            ->with('success','Supplier archived successfully!');
+    }
+
+    // Optional: restore a soft deleted supplier
+    public function restore($supplier_id)
+    {
+        $supplier = Supplier::withTrashed()->where('supplier_id',$supplier_id)->firstOrFail();
+
+        if ($supplier->trashed()) {
+            $supplier->restore();
+            ActivityLog::record(
+                'supplier.restored',
+                $supplier,
+                'Restored supplier: '.$supplier->name,
+                ['supplier_id' => $supplier->supplier_id]
+            );
+        }
+
+        return redirect()
+            ->route('suppliers.index')
+            ->with('success','Supplier restored successfully!');
+    }
+
+    // Optional: force delete (permanent)
+    public function forceDelete($supplier_id)
+    {
+        $supplier = Supplier::withTrashed()->where('supplier_id',$supplier_id)->firstOrFail();
+
+        $name = $supplier->name;
+        $supplier->forceDelete();
+
+        ActivityLog::record(
+            'supplier.permanently_deleted',
+            null,
+            'Permanently deleted supplier: '.$name,
+            ['name' => $name, 'supplier_id' => $supplier_id]
+        );
+
+        return redirect()
+            ->route('suppliers.index')
+            ->with('success','Supplier permanently deleted.');
     }
 }

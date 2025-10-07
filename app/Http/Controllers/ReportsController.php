@@ -102,13 +102,13 @@ class ReportsController extends Controller
         if ($rangeEnd)   $itemsQuery->where('occurred_at','<=',$rangeEnd);
         $topItems = $itemsQuery->groupBy('item_id')->orderByDesc('uses')->limit(5)->get();
 
-        // Event type distribution (top 12)
+        // Event type distribution (top 2)
         $eventTypeCounts = ActivityLog::select('event_type', DB::raw('COUNT(*) as total'))
             ->when($rangeStart, fn($qq)=>$qq->where('occurred_at','>=',$rangeStart))
             ->when($rangeEnd,   fn($qq)=>$qq->where('occurred_at','<=',$rangeEnd))
             ->groupBy('event_type')
             ->orderByDesc('total')
-            ->limit(12)
+            ->limit(2)
             ->get();
 
         // Distinct event types for filter dropdown

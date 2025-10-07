@@ -49,9 +49,20 @@ class Item extends Model
         return $this->hasMany(ServiceItem::class, 'item_id', 'item_id');
     }
 
-    // Optional helper for available stock
     public function scopeActive($query)
     {
         return $query->where('active', 1);
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            $pk = $model->getKeyName();
+            if (!empty($model->{$pk})) return;
+
+            $last = self::withTrashed()->orderByDesc($pk)->first();
+            $n = $last ? (int) preg_replace('/\D/','', $last->{$pk}) : 0;
+            $model->{$pk} = 'ITM' . str_pad($n + 1, 4, '0', STR_PAD_LEFT);
+        });
     }
 }
