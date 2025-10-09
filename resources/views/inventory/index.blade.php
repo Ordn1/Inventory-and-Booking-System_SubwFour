@@ -4,6 +4,10 @@
 
 @section('head')
     <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
+    <style>
+        .inventory-pagination nav ul { justify-content: center; }
+        .inventory-pagination nav { display:flex; justify-content:center; }
+    </style>
 @endsection
 
 @section('content')
@@ -136,11 +140,14 @@
     </div>
 
     @if($items->hasPages())
-        <div class="mt-2">
-            {{ $items->appends([
-                'search' => request('search'),
-                'category_filter' => request('category_filter'),
-            ])->links() }}
+        <div class="mt-2 inventory-pagination" style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div style="font-size:.65rem;opacity:.75;">
+                Page {{ $items->currentPage() }} of {{ $items->lastPage() }}
+                | Showing {{ $items->firstItem() }}–{{ $items->lastItem() }} of {{ $items->total() }}
+            </div>
+            <div style="width:100%;display:flex;justify-content:center;">
+                {{ $items->onEachSide(1)->links() }}
+            </div>
         </div>
     @endif
 </div>

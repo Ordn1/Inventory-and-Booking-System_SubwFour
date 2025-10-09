@@ -4,6 +4,10 @@
 
 @section('head')
     <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
+    <style>
+        .pagination-wrapper nav ul { justify-content: center; }
+        .pagination-wrapper nav { display: flex; justify-content: center; }
+    </style>
 @endsection
 
 @section('content')
@@ -115,7 +119,14 @@
     </div>
 
     @if($logs->hasPages())
-        <div class="mt-2">{{ $logs->links() }}</div>
+        <div class="mt-2 pagination-wrapper" style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div style="font-size:.65rem;opacity:.75;">
+                Page {{ $logs->currentPage() }} of {{ $logs->lastPage() }}
+            </div>
+            <div style="display:flex;justify-content:center;">
+                {{ $logs->onEachSide(1)->links() }}
+            </div>
+        </div>
     @endif
 </div>
 @endsection
