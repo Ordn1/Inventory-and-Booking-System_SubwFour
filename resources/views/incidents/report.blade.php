@@ -1,6 +1,10 @@
-@extends('layouts.system')
+@extends('system')
 
 @section('title', 'Incident Report')
+
+@section('head')
+    <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
+@endsection
 
 @section('content')
 <div class="page-header">
@@ -181,12 +185,22 @@
 </div>
 
 <style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .header-content h1 { color: var(--gray-900); margin: 0; font-size: 1.5rem; }
+    .header-content p { color: var(--gray-600); margin: 5px 0 0 0; }
+    .header-actions { display: flex; gap: 10px; }
+
     .filter-card {
-        background: white;
-        border-radius: 8px;
+        background: linear-gradient(135deg, rgba(34,34,34,.78), rgba(24,24,24,.82));
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-m);
         padding: 20px;
         margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .filter-form {
         display: flex;
@@ -199,29 +213,33 @@
     .filter-group label {
         display: block;
         margin-bottom: 5px;
-        font-size: 13px;
-        color: #666;
+        font-size: .72rem;
+        text-transform: uppercase;
+        color: var(--gray-600);
+        letter-spacing: .55px;
     }
     .filter-group input {
         width: 100%;
         padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
+        background: #1f1f1f;
+        border: 1px solid var(--gray-350);
+        border-radius: var(--radius-m);
+        color: var(--gray-800);
     }
 
     .report-section {
-        background: white;
-        border-radius: 8px;
+        background: linear-gradient(135deg, rgba(34,34,34,.78), rgba(24,24,24,.82));
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-m);
         padding: 25px;
         margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .report-section h2 {
         margin: 0 0 20px 0;
         font-size: 18px;
-        color: #333;
+        color: var(--gray-900);
         padding-bottom: 10px;
-        border-bottom: 2px solid #f0f0f0;
+        border-bottom: 1px solid var(--gray-350);
     }
 
     .summary-grid {
@@ -232,17 +250,18 @@
     .summary-card {
         text-align: center;
         padding: 20px;
-        background: #f8f9fa;
-        border-radius: 8px;
+        background: var(--gray-150);
+        border-radius: var(--radius-m);
+        border: 1px solid var(--gray-300);
     }
     .summary-value {
         font-size: 36px;
         font-weight: bold;
-        color: #007bff;
+        color: var(--brand-red);
     }
     .summary-label {
         font-size: 14px;
-        color: #666;
+        color: var(--gray-600);
         margin-top: 5px;
     }
 
@@ -270,6 +289,7 @@
     .breakdown-count {
         font-weight: bold;
         font-size: 18px;
+        color: var(--gray-900);
     }
 
     .type-breakdown {
@@ -285,23 +305,25 @@
     .type-name {
         min-width: 150px;
         font-size: 14px;
+        color: var(--gray-800);
     }
     .type-bar-container {
         flex: 1;
         height: 20px;
-        background: #f0f0f0;
+        background: var(--gray-350);
         border-radius: 4px;
         overflow: hidden;
     }
     .type-bar {
         height: 100%;
-        background: #007bff;
+        background: var(--brand-red);
         border-radius: 4px;
     }
     .type-count {
         min-width: 50px;
         text-align: right;
         font-weight: bold;
+        color: var(--gray-900);
     }
 
     .status-grid {
@@ -317,6 +339,7 @@
     .status-count {
         font-weight: bold;
         font-size: 18px;
+        color: var(--gray-900);
     }
 
     .report-table {
@@ -327,16 +350,21 @@
     .report-table td {
         padding: 10px;
         text-align: left;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid var(--gray-300);
         font-size: 13px;
     }
     .report-table th {
-        background: #f8f9fa;
+        background: var(--gray-150);
         font-weight: 600;
+        color: var(--gray-700);
+        text-transform: uppercase;
+        font-size: .72rem;
     }
+    .report-table td { color: var(--gray-800); }
     .mono {
         font-family: monospace;
         font-size: 12px;
+        color: var(--gray-700);
     }
 
     .recommendation-list {
@@ -348,34 +376,35 @@
         display: flex;
         gap: 15px;
         padding: 15px;
-        border-radius: 5px;
+        border-radius: var(--radius-s);
     }
     .recommendation i {
         font-size: 24px;
         margin-top: 3px;
     }
     .recommendation.critical {
-        background: #fff5f5;
-        border-left: 4px solid #dc3545;
+        background: rgba(239,53,53,0.08);
+        border-left: 4px solid var(--brand-red);
     }
-    .recommendation.critical i { color: #dc3545; }
+    .recommendation.critical i { color: var(--brand-red); }
     .recommendation.warning {
-        background: #fff8f0;
+        background: rgba(253,126,20,0.08);
         border-left: 4px solid #fd7e14;
     }
     .recommendation.warning i { color: #fd7e14; }
     .recommendation.success {
-        background: #f0fff4;
-        border-left: 4px solid #28a745;
+        background: rgba(34,197,94,0.08);
+        border-left: 4px solid var(--green-500);
     }
-    .recommendation.success i { color: #28a745; }
+    .recommendation.success i { color: var(--green-500); }
     .recommendation strong {
         display: block;
         margin-bottom: 5px;
+        color: var(--gray-900);
     }
     .recommendation p {
         margin: 0;
-        color: #666;
+        color: var(--gray-700);
     }
 
     .severity-badge {
@@ -385,10 +414,10 @@
         font-weight: 600;
     }
     .severity-badge.small { padding: 2px 8px; font-size: 10px; }
-    .severity-badge.critical { background: #dc3545; color: white; }
-    .severity-badge.high { background: #fd7e14; color: white; }
-    .severity-badge.medium { background: #ffc107; color: #333; }
-    .severity-badge.low { background: #28a745; color: white; }
+    .severity-badge.critical { background: rgba(239,53,53,.15); color: var(--brand-red); }
+    .severity-badge.high { background: rgba(253,126,20,.15); color: #fd7e14; }
+    .severity-badge.medium { background: rgba(234,179,8,.15); color: var(--yellow-500); }
+    .severity-badge.low { background: rgba(34,197,94,.15); color: var(--green-500); }
 
     .status-badge {
         padding: 4px 10px;
@@ -396,20 +425,23 @@
         font-size: 12px;
     }
     .status-badge.small { padding: 2px 8px; font-size: 10px; }
-    .status-badge.open { background: #dc3545; color: white; }
-    .status-badge.investigating { background: #ffc107; color: #333; }
-    .status-badge.contained { background: #17a2b8; color: white; }
-    .status-badge.resolved { background: #28a745; color: white; }
-    .status-badge.false_positive { background: #6c757d; color: white; }
-
-    .btn { padding: 10px 16px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
-    .btn-primary { background: #007bff; color: white; }
-    .btn-secondary { background: #6c757d; color: white; }
+    .status-badge.open { background: rgba(239,53,53,.15); color: var(--brand-red); }
+    .status-badge.investigating { background: rgba(234,179,8,.15); color: var(--yellow-500); }
+    .status-badge.contained { background: rgba(59,130,246,.15); color: var(--blue-500); }
+    .status-badge.resolved { background: rgba(34,197,94,.15); color: var(--green-500); }
+    .status-badge.false_positive { background: rgba(108,117,125,.15); color: var(--gray-600); }
 
     @media print {
         .page-header .header-actions,
         .filter-card { display: none; }
-        .report-section { break-inside: avoid; }
+        .report-section { break-inside: avoid; background: white; border: 1px solid #ddd; }
+        .report-section h2 { color: #333; }
+        .summary-card, .report-table th { background: #f8f9fa; }
+        body { background: white; color: #333; }
+    }
+
+    @media (max-width: 992px) {
+        .summary-grid { grid-template-columns: repeat(2, 1fr); }
     }
 </style>
 @endsection

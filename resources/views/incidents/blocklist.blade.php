@@ -1,6 +1,10 @@
-@extends('layouts.system')
+@extends('system')
 
 @section('title', 'IP Blocklist')
+
+@section('head')
+    <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
+@endsection
 
 @section('content')
 <div class="page-header">
@@ -100,15 +104,25 @@
 </div>
 
 <style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .header-content h1 { color: var(--gray-900); margin: 0; font-size: 1.5rem; }
+    .header-content p { color: var(--gray-600); margin: 5px 0 0 0; }
+    .header-actions { display: flex; gap: 10px; }
+
     .blocklist-layout {
         display: grid;
         grid-template-columns: 1fr 350px;
         gap: 20px;
     }
     .table-card {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, rgba(34,34,34,.78), rgba(24,24,24,.82));
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-m);
         overflow: hidden;
     }
     .blocklist-table {
@@ -119,35 +133,43 @@
     .blocklist-table td {
         padding: 15px;
         text-align: left;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid var(--gray-300);
     }
     .blocklist-table th {
-        background: #f8f9fa;
+        background: var(--gray-150);
         font-weight: 600;
+        color: var(--gray-700);
+        font-size: .75rem;
+        text-transform: uppercase;
     }
+    .blocklist-table td { color: var(--gray-800); }
     .mono {
         font-family: monospace;
-        background: #f4f4f4;
+        background: var(--gray-200);
         padding: 5px 10px;
         border-radius: 3px;
+        color: var(--gray-800);
     }
     .expires small {
         display: block;
-        color: #666;
+        color: var(--gray-600);
         font-size: 12px;
     }
     .expires.soon {
-        color: #dc3545;
+        color: var(--brand-red);
     }
     .sidebar-card {
-        background: white;
-        border-radius: 8px;
+        background: linear-gradient(135deg, rgba(34,34,34,.78), rgba(24,24,24,.82));
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-m);
         padding: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         align-self: start;
     }
     .sidebar-card h3 {
         margin: 0 0 20px 0;
+        color: var(--gray-900);
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--gray-350);
     }
     .form-group {
         margin-bottom: 15px;
@@ -155,33 +177,37 @@
     .form-group label {
         display: block;
         margin-bottom: 5px;
-        font-weight: 600;
+        font-size: .72rem;
+        text-transform: uppercase;
+        color: var(--gray-600);
+        letter-spacing: .55px;
     }
     .form-group input,
     .form-group select,
     .form-group textarea {
         width: 100%;
         padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
+        background: #1f1f1f;
+        border: 1px solid var(--gray-350);
+        border-radius: var(--radius-m);
+        color: var(--gray-800);
     }
     .empty-state {
         text-align: center;
         padding: 40px !important;
-        color: #28a745;
+        color: var(--green-500);
     }
     .empty-state i {
         font-size: 48px;
         display: block;
         margin-bottom: 10px;
     }
-    .alert { padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-    .alert-success { background: #d4edda; color: #155724; }
-    .btn { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
-    .btn-sm { padding: 5px 10px; font-size: 12px; }
+    .alert { padding: 15px; border-radius: var(--radius-m); margin-bottom: 20px; }
+    .alert-success { background: rgba(34,197,94,.15); color: var(--green-500); border: 1px solid var(--green-500); }
     .btn-block { width: 100%; justify-content: center; }
-    .btn-secondary { background: #6c757d; color: white; text-decoration: none; }
-    .btn-success { background: #28a745; color: white; }
-    .btn-danger { background: #dc3545; color: white; }
+
+    @media (max-width: 992px) {
+        .blocklist-layout { grid-template-columns: 1fr; }
+    }
 </style>
 @endsection

@@ -1,7 +1,124 @@
-Study the Whole system. because we will be revising the Role Base Access. add new Dashboard specifically for Users and Admin. 
+IMPORTANT:
+    Please carefully review the entire system before beginning any implementation.
+    We are going to revise the Role-Based Access and add a new Dashboard specifically for Users and Admin. 
+    The update needs to be done in a way that does NOT disturb the current code structure. 
+    The structure of the existing code must be preserved; you must maintain the exact structure and formatting of the code in your output.
 
-To implement this I intend to cut this out into 3 parts, this will be the first part, we will not carry out part 2 until part 1 is done.
+Key Considerations:
+    DO NOT proceed to part 2 until part 1 is completed and verified.
+    Strictly follow the current code structure; DO NOT alter anything unnecessarily. 
+    If you add anything, make sure it aligns with the existing pattern.
+    The update must be done without introducing errors or breaking the system. 
+    Ensure that everything works smoothly after every change.
 
-We will update the system WITHOUT ruining its code structure, in fact the way its coded must be the same as your output. SAME Structure of coding. 
+Here are the detailed instructions and guidelines:
+Audit Logs:
+    The "Reports" page is incorrectly named and should be changed to "Audit Logs."
+    A "Reports" page will be separate from Audit Logs and should only report on monthly events within the system.
+    Audit Logs track the system's activity and should be visible only to the Admin. 
+    Review the current access and correct the Role-Based Access.
 
+Admin Dashboard:
+The Admin should only have access to:
+    Admin Dashboard
+    Audit Logs
+    Employees page
+    Security page (This is a new page we will add, so plan carefully for the content of this page).
+Security Page:
+    The Security page is for Admin only and will display:
+    Login analytics: How many times each user has logged in, failed login attempts, etc.
+    User activity: Metrics like login time, duration, etc.
+    You may suggest other analytics features or security-related features that will enhance the Admin’s ability to monitor user activity securely and effectively.
+Employee Access:
+Employees should only have access to the following pages:
+Inventory   
+Services
+    Stock-In
+    Stock-Out
+    Item Categories
+    Service Categories
+    Suppliers
+Stock-Out should be moved to the Audit Logs as it was previously located under the wrong section (Reports).
+The Reports page should have features related to reporting and analytics. 
+Feel free to implement enhancements or suggest other necessary features for the Reports page.
 
+CSS (pages.css):
+    Use pages.css as the reference for pages that follow the same structure.
+    If necessary, add new styles to maintain consistency and improve the user interface for any new features or pages.
+    DO NOT modify existing code unless absolutely necessary. 
+    Only update or add features to maintain system stability.
+
+Strict Code Updates:
+    NO unnecessary changes should be made to the existing codebase.
+    The update is to be performed in a way that preserves the integrity of the original code while adding the new features.
+    Only implement changes that are required.
+
+Role-Based Access:
+    Implement Role-Based Access as described, but avoid overcomplicating the structure.
+    Make sure that each role (Admin, Employee) has access only to their designated areas and that all permissions are clear and straightforward.
+
+Cautionary Notes:
+    Test every update thoroughly to ensure it doesn’t break the existing functionality.
+    Avoid any unnecessary complexity in Role-Based Access—keep it simple and effective.
+    Double-check all permissions and access rights before finalizing your work.
+    Please clarify any questions before starting and ensure that you fully understand the system's needs before proceeding with the updates.
+
+IMPORTANT:
+
+Before proceeding with the update, it is crucial to carefully plan and implement the changes one step at a time to ensure that nothing breaks in the existing functionality. Since the current Reports page (which is incorrectly implemented as Audit Logs) has models, migrations, and controllers referencing it, renaming and restructuring will likely create issues, and we need to be careful to avoid breaking any current dependencies.
+To avoid chaos, we will approach this change gradually and incrementally.
+
+Step-by-Step Process (Start with Part 1):
+Understand the Current Structure:
+    Reports Page: The Reports page is currently acting as Audit Logs, which should not be the case. The Audit Logs must be a separate section, only viewable by the Admin, tracking system events.
+    Models and Migrations: The activity_logs model and migration should remain as Audit Logs. We DO NOT need to rename this unless necessary. However, we will need to create a new model and migration for the actual Reports page.
+    Controllers and Blade Views: The current Reports controller will need to be renamed to AuditLogsController (or similar), and a new ReportsController will need to be created. This will prevent confusion and keep both functionalities separate.
+    Implementing the Audit Logs Page:
+
+First, rework the Audit Logs functionality, keeping the structure intact, but ensuring it's exclusively for Admin access.
+Make sure to update the routes to reflect the changes and make sure the access control works correctly.
+Test the Audit Logs functionality to ensure no errors.
+
+Creating the Reports Page:
+After the Audit Logs are in place, we will focus on the new Reports page:
+This page will only report the system’s monthly activity, not audit logs.
+It will generate PDF reports instead of CSV, and for that, we will create new JavaScript and CSS files:
+reports.css: Should have the same structure as pages.css but dedicated to styling the Reports page.
+reports.js: Dedicated to handling the dynamic functionality of the Reports page (such as PDF generation, if needed).
+
+Reports PDF Generation:
+For PDF generation, you can utilize jsPDF or a similar library to generate the reports.
+In this case, avoid CSV generation, as you’ve explicitly requested a PDF format. We will need a new route for generating and displaying PDF reports.
+
+Role-Based Access (RBAC):
+We will implement the correct Role-Based Access for both Audit Logs and Reports. The Admin will have access to both, while employees will have access only to Reports (viewing the monthly activities, but not the logs).
+
+Page Structure & CSS:
+reports.css: As previously mentioned, should follow the structure of pages.css, ensuring that the theme is consistent. You can create this as a separate CSS file, and no other pages should rely on it.
+If any changes to pages.css are necessary, we’ll apply them very carefully to prevent accidental impacts on other pages.
+
+Testing & Gradual Implementation:
+Once we’ve created and structured Audit Logs and Reports, we will need to test thoroughly. Ensure there are no conflicts with the existing code and that the Role-Based Access is working as intended.
+
+Only implement part 2 after part 1 is fully done. This will avoid overwhelming the system and allow us to catch any issues early on.
+
+Suggested Implementation Order (Part 1):
+Rename and Refactor the Reports Page:
+Start by separating the Audit Logs from the Reports page. This will involve renaming controllers, models, and views related to the Audit Logs.
+Create the New Reports Page:
+Develop the Reports page, including generating the PDF files with the appropriate styles (using reports.css and reports.js).
+Implement Role-Based Access:
+Ensure that Admins can access both Audit Logs and Reports, while employees only see the Reports page.
+
+Test Each Step:
+After implementing each part, test thoroughly to ensure no breakage or unintended changes occur.
+
+Cautionary Notes:
+Renaming and restructuring such as this requires careful tracking of dependencies—pay close attention to how models, controllers, and views are interconnected.
+Do not rush the implementation; taking it step by step will help avoid messing up the system.
+Stick to the code structure—making changes only where absolutely necessary. Only add new features or styles, never alter what’s working.
+
+Next Steps:
+Start with renaming the Reports page to Audit Logs and rework the Audit Logs functionality.
+Once this is verified and working, move on to building the Reports page and generate PDFs.
+Finally, we will handle the Role-Based Access to ensure users only see what they are authorized to.

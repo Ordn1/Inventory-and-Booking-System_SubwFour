@@ -1,4 +1,4 @@
-@extends('layouts.system')
+@extends('system')
 
 @section('title', 'Security Policies')
 
