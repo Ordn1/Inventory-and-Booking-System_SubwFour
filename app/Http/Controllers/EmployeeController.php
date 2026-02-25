@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\User;
 use App\Models\ActivityLog;
+use App\Rules\StrongPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +40,7 @@ class EmployeeController extends Controller
         $data = $request->validate([
             'name'            => ['required','string','max:100'],
             'email'           => ['required','email','max:150','unique:users,email'],
-            'password'        => ['required','confirmed','min:6'],
+            'password'        => ['required','confirmed', new StrongPassword],
             'first_name'      => ['required','string','max:80'],
             'last_name'       => ['required','string','max:80'],
             'address'         => ['required','string','max:255'],
@@ -96,7 +97,7 @@ class EmployeeController extends Controller
         $data = $request->validate([
             'name'            => ['required','string','max:100'],
             'email'           => ['required','email','max:150', Rule::unique('users','email')->ignore($employee->user_id)],
-            'password'        => ['nullable','confirmed','min:6'],
+            'password'        => ['nullable','confirmed', new StrongPassword],
             'first_name'      => ['required','string','max:80'],
             'last_name'       => ['required','string','max:80'],
             'address'         => ['required','string','max:255'],

@@ -24,16 +24,23 @@
     <center>
         <ul>
             @if($user->role === 'admin')
+                {{-- Admin-only navigation --}}
                 <li><a href="{{ route('system') }}" class="nav-link"><i class="bi bi-activity"></i> Dashboard</a></li>
-            @endif
-            <li><a href="{{ route('stock_in.index') }}" class="nav-link"><i class="bi bi-dropbox"></i> Stock-In</a></li>
-            <li><a href="{{ route('inventory.index') }}" class="nav-link"><i class="bi bi-inboxes-fill"></i> Inventory</a></li>
-            <li><a href="{{ route('services.index') }}" class="nav-link"><i class="bi bi-wrench"></i> Service</a></li>
-            <li><a href="{{ route('bookings.index') }}" class="nav-link"><i class="bi bi-person-lines-fill"></i> Bookings</a></li>
-            <li><a href="{{ route('suppliers.index') }}" class="nav-link"><i class="bi bi-person-fill-down"></i> Suppliers</a></li>
-            @if($user->role === 'admin')
-                <li><a href="{{ route('reports.index') }}" class="nav-link"><i class="bi bi-list-columns"></i> Reports</a></li>
+                <li><a href="{{ route('reports.index') }}" class="nav-link"><i class="bi bi-bar-chart-line"></i> Reports</a></li>
+                <li><a href="{{ route('audit_logs.index') }}" class="nav-link"><i class="bi bi-list-columns"></i> Audit Logs</a></li>
                 <li><a href="{{ route('employees.index') }}" class="nav-link"><i class="bi bi-people-fill"></i> Employees</a></li>
+                <li><a href="{{ route('security.index') }}" class="nav-link"><i class="bi bi-shield-lock"></i> Security</a></li>
+                <li><a href="{{ route('incidents.index') }}" class="nav-link"><i class="bi bi-exclamation-triangle"></i> Incidents</a></li>
+                <li><a href="{{ route('system_logs.index') }}" class="nav-link"><i class="bi bi-journal-text"></i> System Logs</a></li>
+            @else
+                {{-- Employee-only navigation --}}
+                <li><a href="{{ route('stock_in.index') }}" class="nav-link"><i class="bi bi-dropbox"></i> Stock-In</a></li>
+                <li><a href="{{ route('inventory.index') }}" class="nav-link"><i class="bi bi-inboxes-fill"></i> Inventory</a></li>
+                <li><a href="{{ route('services.index') }}" class="nav-link"><i class="bi bi-wrench"></i> Service</a></li>
+                <li><a href="{{ route('bookings.index') }}" class="nav-link"><i class="bi bi-person-lines-fill"></i> Bookings</a></li>
+                <li><a href="{{ route('suppliers.index') }}" class="nav-link"><i class="bi bi-person-fill-down"></i> Suppliers</a></li>
+                <li><a href="{{ route('stock_out.index') }}" class="nav-link"><i class="bi bi-box-arrow-up"></i> Stock-Out</a></li>
+                <li><a href="{{ route('reports.index') }}" class="nav-link"><i class="bi bi-bar-chart-line"></i> Reports</a></li>
             @endif
         </ul>
     </center>

@@ -1,0 +1,67 @@
+I want you to study the whole system, because we will be adding extreme security features and code auditing tools.
+
+1. The system aims to:
+• Provide secure data management and access control.
+• Protect user accounts and system resources.
+• Prevent common cyber threats such as SQL injection, unauthorized access, and
+credential leakage.
+
+2. Authentication and Authorization
+List user roles implemented and explain role-based access restrictions.
+Example:
+Password Hashing
+Passwords are never stored in plain text. They are hashed using secure algorithms such as:
+• bcrypt
+• Argon2
+• PBKDF2
+User Roles and Access Control
+Roles implemented:
+• Administrator
+• Regular User
+Access to system functions is restricted based on user roles.
+
+3. Data Encryption
+Explain which data is encrypted within the system.
+Describe encryption methods used such as AES or HTTPS/TLS.
+
+4. Input Validation and Sanitization
+List all user inputs that are validated.
+Example:
+Validated Inputs
+The system validates:
+• Login credentials
+• Form inputs
+• File uploads
+• Search queries
+Tools and Libraries
+Validation implemented using:
+• Built-in framework validators
+• Regular expressions
+• Server-side input sanitization
+
+5. Error Handling and Logging
+Explain how errors are handled securely without exposing technical details.
+Describe logs recorded such as login attempts, errors, and user actions.
+Provide screenshots of log entries.
+Examples:
+Logged Information
+Logs record:
+• Login attempts
+• System errors
+• Access violations
+• User activities
+Screenshots of log entries should be included
+
+6. Security Policies
+Password Policy: Define password complexity and rotation requirements.
+Login Attempt Policy: Define account lock rules after failed attempts.
+Data Handling Policy: Define encryption and authorized access rules.
+Access Control Policy: Admin-only configuration access and logging of attempts.
+Logging and Monitoring Policy: All system activities logged and reviewed.
+Backup and Recovery Policy: Weekly backups stored securely.
+
+7. Incident Response Plan
+Detection: Explain how incidents are detected.
+Reporting: Describe how incidents are reported.
+Containment: Explain how threats are controlled.
+Recovery: Describe how systems are restored.

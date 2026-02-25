@@ -9,24 +9,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('stock_in', function (Blueprint $table) {
-            // Make the custom string ID the primary key (instead of just unique)
             $table->string('stockin_id', 10)->primary();
 
-            $table->string('item_id');      // FK to items.item_id (string PK)
-            $table->string('supplier_id');  // FK to suppliers.supplier_id (string PK)
+            $table->string('item_id');      
+            $table->string('supplier_id');  
 
             $table->unsignedInteger('quantity');
-            $table->decimal('price', 10, 2);       // unit price
-            $table->decimal('total_price', 10, 2); // price * quantity
+            $table->decimal('price', 10, 2);       
+            $table->decimal('total_price', 10, 2);
             $table->date('stockin_date');
             $table->timestamps();
             $table->softDeletes();
 
-            // Indexes (FK columns)
             $table->index('item_id');
             $table->index('supplier_id');
 
-            // FKs
             $table->foreign('item_id')
                   ->references('item_id')->on('items')
                   ->cascadeOnUpdate()

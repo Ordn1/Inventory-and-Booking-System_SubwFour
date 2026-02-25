@@ -1,0 +1,7 @@
+Study the Whole system. because we will be revising the Role Base Access. add new Dashboard specifically for Users and Admin. 
+
+To implement this I intend to cut this out into 3 parts, this will be the first part, we will not carry out part 2 until part 1 is done.
+
+We will update the system WITHOUT ruining its code structure, in fact the way its coded must be the same as your output. SAME Structure of coding. 
+
+

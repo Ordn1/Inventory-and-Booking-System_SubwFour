@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Encrypted;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,6 +19,13 @@ class Supplier extends Model
     protected $primaryKey = 'supplier_id';
     public $incrementing  = false;
     protected $keyType    = 'string';
+
+    /**
+     * Encrypted sensitive fields
+     */
+    protected $casts = [
+        'number' => Encrypted::class,
+    ];
 
     public static $rules = [
         'name'           => 'required|string|max:255|unique:suppliers,name',

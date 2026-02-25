@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Encrypted;
 use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
@@ -21,6 +22,46 @@ class Booking extends Model
         'notes',
         'status',
     ];
+
+    /**
+     * Encrypted sensitive fields (customer PII)
+     */
+    protected $casts = [
+        'email'          => Encrypted::class,
+        'contact_number' => Encrypted::class,
+    ];
+
+    /**
+     * Get masked email for display
+     */
+    public function getMaskedEmailAttribute(): string
+    {
+        $email = $this->email;
+        if (!$email || !is_string($email)) return '—';
+        
+        $parts = explode('@', $email);
+        if (count($parts) !== 2) return '***@***';
+        
+        $user = $parts[0];
+        $domain = $parts[1];
+        
+        if (strlen($user) <= 2) {
+            return $user[0] . '***@' . $domain;
+        }
+        return $user[0] . str_repeat('*', strlen($user) - 2) . substr($user, -1) . '@' . $domain;
+    }
+
+    /**
+     * Get masked contact for display
+     */
+    public function getMaskedContactAttribute(): string
+    {
+        $contact = $this->contact_number;
+        if (!$contact || !is_string($contact)) return '—';
+        
+        $digits = preg_replace('/[^0-9]/', '', $contact);
+        return str_repeat('*', max(0, strlen($digits) - 4)) . substr($digits, -4);
+    }
 
     protected static function booted()
     {

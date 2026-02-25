@@ -127,6 +127,45 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        /*
+        |--------------------------------------------------------------------------
+        | Security Log Channel
+        |--------------------------------------------------------------------------
+        |
+        | This channel is dedicated to security-related events such as:
+        | - Authentication failures
+        | - Authorization violations
+        | - Suspicious activity
+        | - Security exceptions
+        |
+        */
+        'security' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/security.log'),
+            'level' => 'debug',
+            'days' => 30,  // Keep security logs for 30 days
+            'replace_placeholders' => true,
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Audit Log Channel
+        |--------------------------------------------------------------------------
+        |
+        | This channel logs all user actions for audit purposes:
+        | - CRUD operations
+        | - Data access
+        | - Configuration changes
+        |
+        */
+        'audit' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/audit.log'),
+            'level' => 'info',
+            'days' => 90,  // Keep audit logs for 90 days
+            'replace_placeholders' => true,
+        ],
+
     ],
 
 ];

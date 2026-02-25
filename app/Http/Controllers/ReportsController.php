@@ -2,7 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ActivityLog;
+use App\Models\Booking;
+use App\Models\Service;
+use App\Models\Item;
+use App\Models\Supplier;
+use App\Models\StockIn;
+use App\Models\StockOut;
+use App\Models\ServiceItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -11,139 +17,178 @@ class ReportsController extends Controller
 {
     public function index(Request $request)
     {
-        // Inputs
-        $event      = trim((string)$request->input('event_type'));
-        $search     = trim((string)$request->input('search'));
-        $userId     = $request->input('user_id');
-        $dateFrom   = $request->input('date_from');
-        $dateTo     = $request->input('date_to');
-        $export     = $request->input('export'); // csv
+        // Get selected month (default to current month)
+        $selectedMonth = $request->input('month', now()->format('Y-m'));
+        $monthDate = Carbon::parse($selectedMonth . '-01');
+        $monthStart = $monthDate->copy()->startOfMonth();
+        $monthEnd = $monthDate->copy()->endOfMonth();
+        $monthName = $monthDate->format('F Y');
 
-        // Date normalization
-        $rangeStart = $dateFrom ? Carbon::parse($dateFrom)->startOfDay() : null;
-        $rangeEnd   = $dateTo   ? Carbon::parse($dateTo)->endOfDay()   : null;
+        // Previous month for comparison
+        $prevMonthStart = $monthStart->copy()->subMonth();
+        $prevMonthEnd = $prevMonthStart->copy()->endOfMonth();
 
-        // Base query
-        $q = ActivityLog::with('user')->orderByDesc('occurred_at');
+        // ========== BOOKING METRICS ==========
+        $totalBookings = Booking::whereBetween('created_at', [$monthStart, $monthEnd])->count();
+        $prevBookings = Booking::whereBetween('created_at', [$prevMonthStart, $prevMonthEnd])->count();
+        $bookingGrowth = $prevBookings > 0 
+            ? round((($totalBookings - $prevBookings) / $prevBookings) * 100, 1) 
+            : null;
 
-        if ($event)  $q->where('event_type', $event);
-        if ($userId) $q->where('user_id', $userId);
+        $bookingsByStatus = Booking::select('status', DB::raw('COUNT(*) as count'))
+            ->whereBetween('created_at', [$monthStart, $monthEnd])
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
 
-        if ($search) {
-            $q->where(function ($x) use ($search) {
-                $x->where('description', 'like', "%$search%")
-                  ->orWhere('event_type', 'like', "%$search%")
-                  ->orWhere('subject_id', 'like', "%$search%")
-                  ->orWhere('subject_type', 'like', "%$search%");
-            });
-        }
+        // ========== SERVICE METRICS ==========
+        $servicesCompleted = Service::where('status', Service::STATUS_COMPLETED)
+            ->whereBetween('completed_at', [$monthStart, $monthEnd])
+            ->count();
+        $prevServicesCompleted = Service::where('status', Service::STATUS_COMPLETED)
+            ->whereBetween('completed_at', [$prevMonthStart, $prevMonthEnd])
+            ->count();
+        $serviceGrowth = $prevServicesCompleted > 0 
+            ? round((($servicesCompleted - $prevServicesCompleted) / $prevServicesCompleted) * 100, 1) 
+            : null;
 
-        if ($rangeStart) $q->where('occurred_at', '>=', $rangeStart);
-        if ($rangeEnd)   $q->where('occurred_at', '<=', $rangeEnd);
+        $servicesPending = Service::whereIn('status', [Service::STATUS_PENDING, Service::STATUS_IN_PROGRESS])
+            ->count();
 
-        // CSV export (stream)
-        if ($export === 'csv') {
-            $filename = 'activity_logs_' . now()->format('Ymd_His') . '.csv';
-            $headers = [
-                'Content-Type'        => 'text/csv',
-                'Content-Disposition' => "attachment; filename=\"$filename\"",
-            ];
-            return response()->streamDownload(function () use ($q) {
-                $out = fopen('php://output', 'w');
-                fputcsv($out, ['Time','Event','User','SubjectType','SubjectId','Description','Meta']);
-                $q->chunk(500, function ($chunk) use ($out) {
-                    foreach ($chunk as $log) {
-                        fputcsv($out, [
-                            $log->occurred_at,
-                            $log->event_type,
-                            $log->user?->name,
-                            $log->subject_type,
-                            $log->subject_id,
-                            $log->description,
-                            $log->meta ? json_encode($log->meta, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) : '',
-                        ]);
-                    }
-                });
-                fclose($out);
-            }, $filename, $headers);
-        }
+        $servicesCancelled = Service::where('status', Service::STATUS_CANCELLED)
+            ->whereBetween('updated_at', [$monthStart, $monthEnd])
+            ->count();
 
-        $logs = $q->paginate(25)->appends($request->query());
+        // ========== REVENUE METRICS ==========
+        $totalRevenue = Service::where('status', Service::STATUS_COMPLETED)
+            ->whereBetween('completed_at', [$monthStart, $monthEnd])
+            ->sum('total');
+        $prevRevenue = Service::where('status', Service::STATUS_COMPLETED)
+            ->whereBetween('completed_at', [$prevMonthStart, $prevMonthEnd])
+            ->sum('total');
+        $revenueGrowth = $prevRevenue > 0 
+            ? round((($totalRevenue - $prevRevenue) / $prevRevenue) * 100, 1) 
+            : null;
 
-        // Month metrics (fixed month)
-        $startMonth = now()->startOfMonth();
-        $endMonth   = now()->endOfMonth();
-        $monthBase  = ActivityLog::whereBetween('occurred_at', [$startMonth, $endMonth]);
+        $laborFeeTotal = Service::where('status', Service::STATUS_COMPLETED)
+            ->whereBetween('completed_at', [$monthStart, $monthEnd])
+            ->sum('labor_fee');
 
-        $appointmentsThisMonth  = (clone $monthBase)->where('event_type', 'booking.appointed')->count();
-        $servicesCompletedMonth = (clone $monthBase)->where('event_type', 'service.completed')->count();
-        $suppliersAddedMonth    = (clone $monthBase)->where('event_type', 'supplier.created')->count();
-        $itemsAddedMonth        = (clone $monthBase)->where('event_type', 'item.created')->count();
-        $daysElapsed            = now()->day;
-        $avgAppointmentsPerDay  = $daysElapsed ? round($appointmentsThisMonth / $daysElapsed, 2) : 0;
+        $partsRevenue = $totalRevenue - $laborFeeTotal;
 
-        // Range metrics (if a custom date filter is applied; else mirror month stats)
-        $rangeDefined = $rangeStart || $rangeEnd;
-        $rangeBase = ActivityLog::query();
-        if ($rangeStart) $rangeBase->where('occurred_at', '>=', $rangeStart);
-        if ($rangeEnd)   $rangeBase->where('occurred_at', '<=', $rangeEnd);
+        // Average service value
+        $avgServiceValue = $servicesCompleted > 0 
+            ? round($totalRevenue / $servicesCompleted, 2) 
+            : 0;
 
-        $rangeAppointments = $rangeDefined ? (clone $rangeBase)->where('event_type','booking.appointed')->count() : $appointmentsThisMonth;
-        $rangeServices     = $rangeDefined ? (clone $rangeBase)->where('event_type','service.completed')->count() : $servicesCompletedMonth;
+        // ========== INVENTORY METRICS ==========
+        $itemsAdded = Item::whereBetween('created_at', [$monthStart, $monthEnd])->count();
+        
+        $stockInCount = StockIn::whereBetween('created_at', [$monthStart, $monthEnd])->count();
+        $stockInValue = StockIn::whereBetween('created_at', [$monthStart, $monthEnd])->sum('total_price');
 
-        // Top items used (global or within range if range filter applied)
-        $itemsQuery = ActivityLog::select(
-                DB::raw("JSON_UNQUOTE(JSON_EXTRACT(meta,'$.item_id')) as item_id"),
-                DB::raw("COUNT(*) as uses")
+        $stockOutCount = StockOut::whereBetween('created_at', [$monthStart, $monthEnd])->count();
+
+        $lowStockItems = Item::where('quantity', '<', 5)->count();
+
+        $currentInventoryValue = Item::select(DB::raw('SUM(quantity * COALESCE(unit_price, 0)) as total'))
+            ->value('total') ?? 0;
+
+        // ========== SUPPLIER METRICS ==========
+        $suppliersAdded = Supplier::whereBetween('created_at', [$monthStart, $monthEnd])->count();
+        $totalSuppliers = Supplier::count();
+
+        // ========== TOP PERFORMERS ==========
+        // Top 5 items used
+        $topItemsUsed = DB::table('service_items')
+            ->join('services', 'services.id', '=', 'service_items.service_id')
+            ->join('items', 'items.item_id', '=', 'service_items.item_id')
+            ->where('services.status', Service::STATUS_COMPLETED)
+            ->whereBetween('services.completed_at', [$monthStart, $monthEnd])
+            ->select(
+                'items.item_id',
+                'items.name',
+                DB::raw('SUM(service_items.quantity) as total_qty'),
+                DB::raw('SUM(service_items.line_total) as total_revenue')
             )
-            ->where('event_type', 'service.item_used')
-            ->whereNotNull('meta');
-        if ($rangeStart) $itemsQuery->where('occurred_at','>=',$rangeStart);
-        if ($rangeEnd)   $itemsQuery->where('occurred_at','<=',$rangeEnd);
-        $topItems = $itemsQuery->groupBy('item_id')->orderByDesc('uses')->limit(5)->get();
-
-        // Event type distribution (top 2)
-        $eventTypeCounts = ActivityLog::select('event_type', DB::raw('COUNT(*) as total'))
-            ->when($rangeStart, fn($qq)=>$qq->where('occurred_at','>=',$rangeStart))
-            ->when($rangeEnd,   fn($qq)=>$qq->where('occurred_at','<=',$rangeEnd))
-            ->groupBy('event_type')
-            ->orderByDesc('total')
-            ->limit(2)
+            ->groupBy('items.item_id', 'items.name')
+            ->orderByDesc('total_qty')
+            ->limit(5)
             ->get();
 
-        // Distinct event types for filter dropdown
-        $eventTypes = ActivityLog::select('event_type')->distinct()->orderBy('event_type')->pluck('event_type');
+        // Top service types (from bookings)
+        $topServiceTypes = Booking::select('service_type', DB::raw('COUNT(*) as count'))
+            ->whereBetween('created_at', [$monthStart, $monthEnd])
+            ->groupBy('service_type')
+            ->orderByDesc('count')
+            ->limit(5)
+            ->get();
 
-        // Distinct users
-        $users = ActivityLog::select('user_id')
-            ->whereNotNull('user_id')
-            ->distinct()
-            ->with('user:id,name')
-            ->get()
-            ->pluck('user')
-            ->filter()
-            ->unique('id')
-            ->values();
+        // ========== DAILY BREAKDOWN ==========
+        $dailyBookings = Booking::select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('COUNT(*) as count')
+            )
+            ->whereBetween('created_at', [$monthStart, $monthEnd])
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $dailyRevenue = Service::where('status', Service::STATUS_COMPLETED)
+            ->whereBetween('completed_at', [$monthStart, $monthEnd])
+            ->select(
+                DB::raw('DATE(completed_at) as date'),
+                DB::raw('SUM(total) as revenue')
+            )
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Available months for dropdown (last 12 months)
+        $availableMonths = collect();
+        for ($i = 0; $i < 12; $i++) {
+            $m = now()->subMonths($i);
+            $availableMonths->push([
+                'value' => $m->format('Y-m'),
+                'label' => $m->format('F Y')
+            ]);
+        }
 
         return view('reports.index', compact(
-            'logs',
-            'event',
-            'search',
-            'userId',
-            'dateFrom',
-            'dateTo',
-            'appointmentsThisMonth',
-            'servicesCompletedMonth',
-            'suppliersAddedMonth',
-            'itemsAddedMonth',
-            'avgAppointmentsPerDay',
-            'topItems',
-            'eventTypes',
-            'users',
-            'rangeAppointments',
-            'rangeServices',
-            'eventTypeCounts',
-            'rangeDefined'
+            'selectedMonth',
+            'monthName',
+            'availableMonths',
+            // Bookings
+            'totalBookings',
+            'bookingGrowth',
+            'bookingsByStatus',
+            // Services
+            'servicesCompleted',
+            'serviceGrowth',
+            'servicesPending',
+            'servicesCancelled',
+            // Revenue
+            'totalRevenue',
+            'revenueGrowth',
+            'laborFeeTotal',
+            'partsRevenue',
+            'avgServiceValue',
+            // Inventory
+            'itemsAdded',
+            'stockInCount',
+            'stockInValue',
+            'stockOutCount',
+            'lowStockItems',
+            'currentInventoryValue',
+            // Suppliers
+            'suppliersAdded',
+            'totalSuppliers',
+            // Top performers
+            'topItemsUsed',
+            'topServiceTypes',
+            // Daily data for charts
+            'dailyBookings',
+            'dailyRevenue'
         ));
     }
 }

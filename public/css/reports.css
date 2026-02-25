@@ -1,0 +1,464 @@
+/* =====================================================================
+   Reports Page Styles
+   Follows the same structure as pages.css
+===================================================================== */
+
+/* =====================================================================
+   Reports Header
+===================================================================== */
+.reports-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.reports-header h2 {
+    margin: 0;
+}
+
+.reports-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.month-selector select {
+    min-width: 180px;
+}
+
+/* =====================================================================
+   Report Sections
+===================================================================== */
+.report-section {
+    background: linear-gradient(135deg, rgba(34,34,34,.78), rgba(24,24,24,.82));
+    border: 1px solid var(--gray-300);
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px) saturate(160%);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    box-shadow: 0 6px 28px -6px rgba(0,0,0,.8), 0 2px 8px rgba(0,0,0,.55);
+}
+
+.section-title {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--gray-900);
+    margin: 0 0 18px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--gray-350);
+    letter-spacing: .5px;
+}
+
+/* =====================================================================
+   Metrics Grid (Main Summary)
+===================================================================== */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.metric-card {
+    background: linear-gradient(145deg, #252525, #1e1e1e);
+    border: 1px solid var(--gray-350);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+
+.metric-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.metric-primary .metric-icon { background: rgba(239, 53, 53, 0.15); color: var(--brand-red); }
+.metric-success .metric-icon { background: rgba(34, 197, 94, 0.15); color: var(--green-500); }
+.metric-info .metric-icon { background: rgba(59, 130, 246, 0.15); color: var(--blue-500); }
+.metric-warning .metric-icon { background: rgba(234, 179, 8, 0.15); color: var(--yellow-500); }
+
+.metric-content {
+    flex: 1;
+}
+
+.metric-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1.2;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+.metric-growth {
+    font-size: 0.72rem;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.metric-growth.positive { color: var(--green-500); }
+.metric-growth.negative { color: var(--brand-red); }
+
+/* =====================================================================
+   Revenue Breakdown
+===================================================================== */
+.breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.breakdown-card {
+    background: #1f1f1f;
+    border: 1px solid var(--gray-350);
+    border-radius: 12px;
+    padding: 18px;
+}
+
+.breakdown-label {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.breakdown-value {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 12px;
+}
+
+.breakdown-bar {
+    height: 8px;
+    background: var(--gray-300);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.bar-labor { background: linear-gradient(90deg, var(--brand-red), var(--brand-red-alt)); }
+.bar-parts { background: linear-gradient(90deg, var(--blue-500), #60a5fa); }
+
+/* =====================================================================
+   Status Distribution
+===================================================================== */
+.status-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.status-card {
+    background: #1f1f1f;
+    border: 1px solid var(--gray-350);
+    border-radius: 12px;
+    padding: 16px 24px;
+    text-align: center;
+    min-width: 120px;
+}
+
+.status-count {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.status-label {
+    font-size: 0.72rem;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 4px;
+}
+
+.status-pending { border-left: 4px solid var(--yellow-500); }
+.status-completed { border-left: 4px solid var(--green-500); }
+.status-appointed { border-left: 4px solid var(--blue-500); }
+.status-rejected { border-left: 4px solid var(--brand-red); }
+.status-default { border-left: 4px solid var(--gray-500); }
+
+/* =====================================================================
+   Service Metrics
+===================================================================== */
+.service-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.service-metric {
+    background: #1f1f1f;
+    border: 1px solid var(--gray-350);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+}
+
+.sm-value {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.sm-label {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 6px;
+}
+
+.text-success { color: var(--green-500); }
+.text-warning { color: var(--yellow-500); }
+.text-danger { color: var(--brand-red); }
+
+/* =====================================================================
+   Inventory Grid
+===================================================================== */
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+}
+
+.inv-card {
+    background: #1f1f1f;
+    border: 1px solid var(--gray-350);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.inv-card:hover {
+    transform: translateY(-2px);
+}
+
+.inv-icon {
+    font-size: 1.5rem;
+    color: var(--gray-600);
+    margin-bottom: 8px;
+}
+
+.inv-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.inv-label {
+    font-size: 0.7rem;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 6px;
+}
+
+.inv-warning {
+    border-color: var(--yellow-500);
+}
+
+.inv-warning .inv-icon,
+.inv-warning .inv-value {
+    color: var(--yellow-500);
+}
+
+.inv-highlight {
+    background: linear-gradient(145deg, rgba(239,53,53,0.08), #1f1f1f);
+    border-color: var(--brand-red);
+}
+
+.inv-highlight .inv-icon { color: var(--brand-red); }
+
+/* =====================================================================
+   Report Table
+===================================================================== */
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.report-table thead {
+    background: #1a1a1a;
+}
+
+.report-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--gray-350);
+}
+
+.report-table td {
+    padding: 12px 14px;
+    color: var(--gray-800);
+    border-bottom: 1px solid var(--gray-300);
+}
+
+.report-table tbody tr:hover {
+    background: rgba(255,255,255,0.02);
+}
+
+.report-table .empty-row {
+    text-align: center;
+    color: var(--gray-600);
+    font-style: italic;
+}
+
+/* =====================================================================
+   Service Types Grid
+===================================================================== */
+.service-types-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.service-type-card {
+    background: #1f1f1f;
+    border: 1px solid var(--gray-350);
+    border-radius: 10px;
+    padding: 14px 20px;
+    min-width: 150px;
+}
+
+.st-name {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.st-count {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+}
+
+/* =====================================================================
+   Supplier Summary
+===================================================================== */
+.supplier-summary {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.supplier-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.ss-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--brand-red);
+}
+
+.ss-label {
+    font-size: 0.85rem;
+    color: var(--gray-700);
+}
+
+/* =====================================================================
+   Empty States
+===================================================================== */
+.empty-message {
+    color: var(--gray-600);
+    font-style: italic;
+    padding: 20px;
+    text-align: center;
+}
+
+/* =====================================================================
+   Responsive Adjustments
+===================================================================== */
+@media (max-width: 768px) {
+    .reports-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .reports-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .reports-actions .btn,
+    .month-selector select {
+        width: 100%;
+    }
+
+    .service-metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .metric-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .metric-icon {
+        margin: 0 auto;
+    }
+}
+
+/* =====================================================================
+   Print / PDF Styles
+===================================================================== */
+@media print {
+    .reports-header,
+    .reports-actions,
+    #generatePdfBtn {
+        display: none !important;
+    }
+
+    .report-section {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    body {
+        background: white;
+        color: black;
+    }
+}
