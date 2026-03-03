@@ -49,12 +49,14 @@ class AuthController extends Controller
             SystemLog::security(
                 "Account lockout triggered for username: {$username}",
                 'user.lockout',
-                ['username' => $username, 'remaining_minutes' => $lockoutInfo['remaining_minutes']]
+                ['username' => $username, 'remaining_seconds' => $lockoutInfo['remaining_seconds']]
             );
+            
+            $remainingSeconds = $lockoutInfo['remaining_seconds'];
             
             return response()->json([
                 'success' => false,
-                'message' => "Too many failed login attempts. Please try again in {$lockoutInfo['remaining_minutes']} minute(s).",
+                'message' => "Too many failed login attempts. Please try again in {$remainingSeconds} second(s).",
             ], 429);
         }
 
@@ -101,16 +103,17 @@ class AuthController extends Controller
         );
         
         // Get remaining attempts for user feedback
+        $maxAttempts = config('security.login.max_attempts', 3);
         $remainingAttempts = LoginAttempt::remainingAttempts($username, $ipAddress);
         
         // Record brute force incident when attempts are high
-        $totalAttempts = 5 - $remainingAttempts;
-        if ($totalAttempts >= 3) {
+        $totalAttempts = $maxAttempts - $remainingAttempts;
+        if ($totalAttempts >= 2) {
             SecurityIncident::recordBruteForce($username, $totalAttempts);
         }
         
         $errorMessage = 'The provided credentials do not match our records.';
-        if ($remainingAttempts <= 3 && $remainingAttempts > 0) {
+        if ($remainingAttempts <= 2 && $remainingAttempts > 0) {
             $errorMessage .= " Warning: {$remainingAttempts} attempt(s) remaining before account lockout.";
         }
 

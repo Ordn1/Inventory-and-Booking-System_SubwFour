@@ -51,10 +51,10 @@ return [
 
     'login' => [
         // Maximum failed attempts before lockout
-        'max_attempts' => 5,
+        'max_attempts' => 3,
         
-        // Lockout duration in minutes
-        'lockout_minutes' => 15,
+        // Lockout duration in seconds
+        'lockout_seconds' => 30,
         
         // Progressive lockout (multiply lockout time after repeated lockouts)
         'progressive_lockout' => true,

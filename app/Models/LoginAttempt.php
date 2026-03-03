@@ -95,13 +95,16 @@ class LoginAttempt extends Model
      * @param string|null $username
      * @param string|null $ip
      * @param int $maxAttempts Maximum failed attempts before lockout
-     * @param int $lockoutMinutes Minutes to lock out after max attempts
-     * @return array ['locked' => bool, 'remaining_minutes' => int|null, 'attempts' => int]
+     * @param int $lockoutSeconds Seconds to lock out after max attempts
+     * @return array ['locked' => bool, 'remaining_seconds' => int|null, 'attempts' => int]
      */
-    public static function isLockedOut(?string $username, ?string $ip = null, int $maxAttempts = 5, int $lockoutMinutes = 15): array
+    public static function isLockedOut(?string $username, ?string $ip = null, ?int $maxAttempts = null, ?int $lockoutSeconds = null): array
     {
+        $maxAttempts = $maxAttempts ?? config('security.login.max_attempts', 3);
+        $lockoutSeconds = $lockoutSeconds ?? config('security.login.lockout_seconds', 30);
+        
         $ip = $ip ?? request()->ip();
-        $lockoutTime = now()->subMinutes($lockoutMinutes);
+        $lockoutTime = now()->subSeconds($lockoutSeconds);
         
         // Count failed attempts for this username OR IP within lockout window
         $failedAttempts = static::failed()
@@ -123,13 +126,13 @@ class LoginAttempt extends Model
                 ->first();
             
             if ($lastAttempt) {
-                $unlockTime = $lastAttempt->attempted_at->addMinutes($lockoutMinutes);
-                $remainingMinutes = now()->diffInMinutes($unlockTime, false);
+                $unlockTime = $lastAttempt->attempted_at->addSeconds($lockoutSeconds);
+                $remainingSeconds = (int) now()->diffInSeconds($unlockTime, false);
                 
-                if ($remainingMinutes > 0) {
+                if ($remainingSeconds > 0) {
                     return [
                         'locked' => true,
-                        'remaining_minutes' => $remainingMinutes,
+                        'remaining_seconds' => $remainingSeconds,
                         'attempts' => $failedAttempts,
                     ];
                 }
@@ -138,7 +141,7 @@ class LoginAttempt extends Model
         
         return [
             'locked' => false,
-            'remaining_minutes' => null,
+            'remaining_seconds' => null,
             'attempts' => $failedAttempts,
         ];
     }
@@ -157,9 +160,10 @@ class LoginAttempt extends Model
     /**
      * Get remaining attempts before lockout
      */
-    public static function remainingAttempts(?string $username, ?string $ip = null, int $maxAttempts = 5, int $lockoutMinutes = 15): int
+    public static function remainingAttempts(?string $username, ?string $ip = null, ?int $maxAttempts = null, ?int $lockoutSeconds = null): int
     {
-        $lockoutInfo = static::isLockedOut($username, $ip, $maxAttempts, $lockoutMinutes);
+        $maxAttempts = $maxAttempts ?? config('security.login.max_attempts', 3);
+        $lockoutInfo = static::isLockedOut($username, $ip, $maxAttempts, $lockoutSeconds);
         return max(0, $maxAttempts - $lockoutInfo['attempts']);
     }
 }
