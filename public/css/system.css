@@ -1,93 +1,7 @@
-/* =====================================================================
-   Global Imports / Fonts
-===================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+/* System Layout */
+@import url('variables.css');
 
-/* =====================================================================
-   Color System
-===================================================================== */
-:root {
-    /* Neutral Scale */
-    --gray-0: #000000;
-    --gray-25: #0c0c0c;
-    --gray-50: #121212;
-    --gray-75: #161616;
-    --gray-100: #1c1c1c;
-    --gray-150: #222222;
-    --gray-200: #262626;
-    --gray-250: #2b2b2b;
-    --gray-300: #333333;
-    --gray-350: #3b3b3b;
-    --gray-400: #444444;
-    --gray-450: #4d4d4d;
-    --gray-500: #5a5a5a;
-    --gray-550: #686868;
-    --gray-600: #7a7a7a;
-    --gray-700: #909090;
-    --gray-800: #b3b3b3;
-    --gray-900: #e2e2e2;
-    --gray-950: #f2f2f2;
-
-    /* Reds (accent only) */
-    --red-300: #ff7d7d;
-    --red-400: #ff5252;
-    --red-450: #ff4040;
-    --red-500: #ef3535;
-    --red-550: #d92a2a;
-    --red-600: #c21f1f;
-    --red-700: #a11313;
-
-    /* Semantic (optional) */
-    --green-500: #1db654;
-    --yellow-500: #e3b341;
-
-    /* Theme Tokens */
-    --sidebar-width: 200px;
-    --sidebar-bg: var(--gray-0);
-    --sidebar-accent: var(--gray-200);
-    --sidebar-accent-hover: var(--gray-300);
-
-    --surface-base: var(--gray-100);
-    --surface-alt: var(--gray-75);
-    --surface-muted: var(--gray-150);
-    --border-subtle: var(--gray-300);
-
-    --text-strong: var(--gray-950);
-    --text-default: var(--gray-800);
-    --text-dim: var(--gray-600);
-    --text-invert: #ffffff;
-
-    --brand-red: var(--red-500);
-    --brand-red-alt: var(--red-400);
-    --brand-red-soft: rgba(255,82,82,0.12);
-
-    --focus-ring: 0 0 0 3px rgba(239,53,53,0.4);
-
-    --gradient-brand: linear-gradient(135deg,var(--red-600),var(--red-400));
-    --gradient-soft: linear-gradient(135deg,#1c1c1c,#262626);
-
-    /* Shadows / Radii / Motion */
-    --shadow-soft: 0 2px 8px rgba(0,0,0,.4);
-    --shadow-med: 0 4px 18px rgba(0,0,0,.55);
-    --shadow-strong: 0 8px 30px rgba(0,0,0,.65);
-    --radius-xs: 4px;
-    --radius-s: 6px;
-    --radius-m: 10px;
-    --radius-l: 14px;
-    --radius-xl: 20px;
-    --transition-fast: .18s;
-    --transition-base: .32s;
-    --easing: cubic-bezier(.4,0,.2,1);
-
-    --header-height: 60px;
-    --footer-height: 42px;
-}
-
-/* =====================================================================
-   Reset / Base
-===================================================================== */
+/* Reset */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
     font-family: 'Poppins', sans-serif;
@@ -113,9 +27,7 @@ a:hover { color: var(--brand-red); }
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--brand-red); }
 
-/* =====================================================================
-   Sidebar
-===================================================================== */
+/* Sidebar */
 .sidebar {
     position: fixed;
     top: 0; left: 0;
@@ -233,9 +145,7 @@ body.sidebar-collapsed .sidebar {
     box-shadow: none;
 }
 
-/* =====================================================================
-   Header
-===================================================================== */
+/* Header */
 .header {
     position: fixed;
     top: 0;
@@ -290,9 +200,7 @@ body.sidebar-collapsed .header { left: 0; width: 100%; }
     outline: none;
 }
 
-/* =====================================================================
-   Main Content
-===================================================================== */
+/* Main Content */
 .main-content {
     margin-top: var(--header-height);
     margin-left: var(--sidebar-width);
@@ -314,9 +222,7 @@ body.sidebar-collapsed .main-content { margin-left: 0; }
     letter-spacing: .5px;
 }
 
-/* =====================================================================
-   Cards
-===================================================================== */
+/* Cards */
 .card {
     background: var(--surface-base);
     border: 1px solid var(--gray-300);
@@ -348,9 +254,7 @@ body.sidebar-collapsed .main-content { margin-left: 0; }
 }
 .card:hover::before { opacity: .4; }
 
-/* =====================================================================
-   Footer
-===================================================================== */
+/* Footer */
 .footer {
     position: fixed;
     bottom: 0;
@@ -371,9 +275,7 @@ body.sidebar-collapsed .main-content { margin-left: 0; }
 .footer p { color: var(--gray-700); }
 body.sidebar-collapsed .footer { left: 0; width: 100%; }
 
-/* =====================================================================
-   User Profile
-===================================================================== */
+/* User Profile */
 .user-profile {
     margin-left: auto;
     display: flex;
@@ -415,9 +317,7 @@ body.sidebar-collapsed .footer { left: 0; width: 100%; }
     border-color: var(--brand-red);
 }
 
-/* =====================================================================
-   Dropdown Menu
-===================================================================== */
+/* Dropdown */
 .dropdown-menu {
     position: absolute;
     top: 55px;
@@ -490,9 +390,7 @@ body.sidebar-collapsed .footer { left: 0; width: 100%; }
     transform: translateY(-2px);
 }
 
-/* =====================================================================
-   Modals
-===================================================================== */
+/* Modals */
 .modal {
     position: fixed;
     inset: 0;
@@ -555,9 +453,7 @@ body.sidebar-collapsed .footer { left: 0; width: 100%; }
 
 .hidden { display: none; }
 
-/* =====================================================================
-   Forms
-===================================================================== */
+/* Forms */
 .form-row {
     display: flex;
     gap: 16px;
@@ -669,11 +565,7 @@ body.sidebar-collapsed .footer { left: 0; width: 100%; }
 }
 .input-group { max-width: 620px; margin: 0 auto; }
 
-/* =====================================================================
-   Shared Base Helpers (Added)
-===================================================================== */
-:root {
-}
+/* Shared Helpers */
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -761,9 +653,7 @@ body.sidebar-collapsed .footer { left: 0; width: 100%; }
     border-color: var(--brand-red-alt);
 }
 
-/* =====================================================================
-   Motion & Animation
-===================================================================== */
+/* Animation */
 @keyframes fadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
@@ -789,9 +679,7 @@ body.sidebar-collapsed .footer { left: 0; width: 100%; }
     }
 }
 
-/* =====================================================================
-   Responsive
-===================================================================== */
+/* Responsive */
 @media (max-width: 780px) {
     body.sidebar-collapsed .sidebar {
         transform: translateX(calc(-1 * var(--sidebar-width)));
@@ -818,9 +706,7 @@ body.sidebar-collapsed .footer { left: 0; width: 100%; }
     }
 }
 
-/* =====================================================================
-   Employee Module Styles
-===================================================================== */
+/* Employee */
 
 /* Employee Name Link (clickable in table) */
 .employee-name-link {
@@ -882,9 +768,7 @@ body.sidebar-collapsed .footer { left: 0; width: 100%; }
     font-size: .72rem;
 }
 
-/* =====================================================================
-   Facebook-Style Employee Profile Modal
-===================================================================== */
+/* Employee Profile Modal */
 .employee-profile-modal {
     width: 540px;
     max-width: 95%;
@@ -1076,9 +960,7 @@ body.sidebar-collapsed .footer { left: 0; width: 100%; }
     }
 }
 
-/* =====================================================================
-   Facebook-Style Profile Modal (System Dropdown)
-===================================================================== */
+/* FB Profile Modal */
 .fb-profile-modal {
     width: 420px;
     max-width: 95vw;

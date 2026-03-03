@@ -4,53 +4,6 @@
 
 @section('head')
     <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
-    <style>
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .stat-card { background: linear-gradient(135deg, rgba(34,34,34,.78), rgba(24,24,24,.82)); border: 1px solid var(--gray-300); border-radius: 12px; padding: 16px; text-align: center; }
-        .stat-card .value { font-size: 2rem; font-weight: 700; color: var(--gray-900); }
-        .stat-card .label { font-size: .75rem; color: var(--gray-600); text-transform: uppercase; margin-top: 4px; }
-        .stat-card.security { border-color: var(--brand-red); }
-        .stat-card.security .value { color: var(--brand-red); }
-        .stat-card.error { border-color: var(--yellow-500); }
-        .stat-card.error .value { color: var(--yellow-500); }
-        
-        .filter-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; align-items: flex-end; }
-        .filter-group { display: flex; flex-direction: column; gap: 4px; }
-        .filter-group label { font-size: .75rem; color: var(--gray-600); }
-        .filter-group select, .filter-group input { padding: 8px 12px; border-radius: 6px; border: 1px solid var(--gray-350); background: var(--gray-200); color: var(--gray-900); font-size: .85rem; }
-        
-        .logs-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
-        .logs-table th { text-align: left; padding: 10px 8px; border-bottom: 2px solid var(--gray-350); color: var(--gray-600); font-weight: 500; font-size: .75rem; text-transform: uppercase; }
-        .logs-table td { padding: 10px 8px; border-bottom: 1px solid var(--gray-300); color: var(--gray-800); vertical-align: top; }
-        .logs-table tr:hover { background: rgba(255,255,255,.02); }
-        
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: .65rem; font-weight: 600; text-transform: uppercase; }
-        .badge-danger { background: rgba(239,53,53,.15); color: var(--brand-red); }
-        .badge-warning { background: rgba(234,179,8,.15); color: var(--yellow-500); }
-        .badge-info { background: rgba(59,130,246,.15); color: var(--blue-500); }
-        .badge-success { background: rgba(34,197,94,.15); color: var(--green-500); }
-        .badge-secondary { background: var(--gray-300); color: var(--gray-700); }
-        
-        .log-message { max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .log-time { font-size: .7rem; color: var(--gray-600); white-space: nowrap; }
-        .log-action { font-family: monospace; font-size: .75rem; color: var(--gray-700); }
-        .log-ip { font-family: monospace; font-size: .7rem; color: var(--gray-600); }
-        
-        .view-btn { background: none; border: none; color: var(--blue-500); cursor: pointer; font-size: .8rem; }
-        .view-btn:hover { text-decoration: underline; }
-        
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.7); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-overlay.active { display: flex; }
-        .modal-content { background: var(--gray-100); border-radius: 12px; padding: 24px; max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-title { font-size: 1.1rem; font-weight: 600; color: var(--gray-900); }
-        .modal-close { background: none; border: none; font-size: 1.5rem; color: var(--gray-600); cursor: pointer; }
-        .modal-row { display: flex; padding: 8px 0; border-bottom: 1px solid var(--gray-300); }
-        .modal-row:last-child { border-bottom: none; }
-        .modal-label { width: 120px; font-weight: 500; color: var(--gray-600); font-size: .85rem; }
-        .modal-value { flex: 1; color: var(--gray-900); font-size: .85rem; word-break: break-all; }
-        .context-block { background: var(--gray-200); border-radius: 6px; padding: 12px; font-family: monospace; font-size: .75rem; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
-    </style>
 @endsection
 
 @section('content')

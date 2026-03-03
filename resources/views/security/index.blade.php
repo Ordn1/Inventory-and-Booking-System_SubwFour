@@ -4,62 +4,6 @@
 
 @section('head')
     <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
-    <style>
-        .security-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px; }
-        .security-card { background: linear-gradient(135deg, rgba(34,34,34,.78), rgba(24,24,24,.82)); border: 1px solid var(--gray-300); border-radius: 14px; padding: 20px; }
-        .security-card h4 { margin: 0 0 16px 0; font-size: .9rem; color: var(--gray-700); text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--gray-350); padding-bottom: 10px; }
-        
-        .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--gray-300); }
-        .stat-row:last-child { border-bottom: none; }
-        .stat-label { color: var(--gray-600); font-size: .85rem; }
-        .stat-value { font-weight: 600; color: var(--gray-900); font-size: 1rem; }
-        .stat-value.success { color: var(--green-500); }
-        .stat-value.danger { color: var(--brand-red); }
-        .stat-value.warning { color: var(--yellow-500); }
-        .stat-value.info { color: var(--blue-500); }
-        
-        .big-stat { text-align: center; padding: 20px; }
-        .big-stat .value { font-size: 2.5rem; font-weight: 700; color: var(--gray-900); }
-        .big-stat .label { font-size: .75rem; color: var(--gray-600); text-transform: uppercase; margin-top: 4px; }
-        .big-stat.highlight { background: linear-gradient(145deg, rgba(239,53,53,0.08), transparent); border-radius: 12px; }
-        
-        .mini-table { width: 100%; font-size: .8rem; }
-        .mini-table th { text-align: left; color: var(--gray-600); font-weight: 500; padding: 8px 6px; border-bottom: 1px solid var(--gray-350); }
-        .mini-table td { padding: 8px 6px; color: var(--gray-800); border-bottom: 1px solid var(--gray-300); }
-        .mini-table tr:hover { background: rgba(255,255,255,.02); }
-        
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: .7rem; font-weight: 600; text-transform: uppercase; }
-        .badge-success { background: rgba(34,197,94,.15); color: var(--green-500); }
-        .badge-danger { background: rgba(239,53,53,.15); color: var(--brand-red); }
-        .badge-warning { background: rgba(234,179,8,.15); color: var(--yellow-500); }
-        .badge-info { background: rgba(59,130,246,.15); color: var(--blue-500); }
-        
-        .threat-card { background: linear-gradient(145deg, rgba(239,53,53,0.05), rgba(24,24,24,.82)); border-color: var(--brand-red); }
-        .active-card { background: linear-gradient(145deg, rgba(34,197,94,0.05), rgba(24,24,24,.82)); border-color: var(--green-500); }
-        
-        .ip-mono { font-family: monospace; font-size: .75rem; color: var(--gray-700); }
-        .time-ago { font-size: .7rem; color: var(--gray-600); }
-        
-        .activity-list { max-height: 400px; overflow-y: auto; }
-        .activity-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--gray-300); }
-        .activity-item:last-child { border-bottom: none; }
-        .activity-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .activity-icon.success { background: rgba(34,197,94,.15); color: var(--green-500); }
-        .activity-icon.failed { background: rgba(239,53,53,.15); color: var(--brand-red); }
-        .activity-content { flex: 1; min-width: 0; }
-        .activity-title { font-size: .85rem; color: var(--gray-900); }
-        .activity-meta { font-size: .7rem; color: var(--gray-600); margin-top: 2px; }
-        
-        .trend-bars { display: flex; gap: 6px; align-items: flex-end; height: 80px; padding: 10px 0; }
-        .trend-bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .trend-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 4px; }
-        .trend-bar.success { background: var(--green-500); }
-        .trend-bar.failed { background: var(--brand-red); }
-        .trend-label { font-size: .6rem; color: var(--gray-600); }
-
-        .section-title { font-size: 1rem; font-weight: 600; color: var(--gray-900); margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; }
-        .section-title i { color: var(--brand-red); }
-    </style>
 @endsection
 
 @section('content')

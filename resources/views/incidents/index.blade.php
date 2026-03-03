@@ -58,7 +58,7 @@
         <div class="stat-icon high"><i class="fas fa-exclamation-triangle"></i></div>
         <div class="stat-content">
             <span class="stat-value">{{ $stats['high'] }}</span>
-            <span class="stat-label">High Severity Open</span>
+            <span class="stat-label">High Severity</span>
         </div>
     </div>
     <div class="stat-card">
@@ -345,14 +345,14 @@
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(6, 1fr);
-        gap: 15px;
+        gap: 10px;
         margin-bottom: 20px;
     }
     .stat-card {
         background: linear-gradient(135deg, rgba(34,34,34,.78), rgba(24,24,24,.82));
         border: 1px solid var(--gray-300);
         border-radius: var(--radius-m);
-        padding: 20px;
+        padding: 12px 14px;;
         display: flex;
         align-items: center;
     }
@@ -360,13 +360,13 @@
     .stat-card.high { border-left: 4px solid #fd7e14; background: linear-gradient(145deg, rgba(253,126,20,0.08), rgba(24,24,24,.82)); }
     
     .stat-icon {
-        width: 50px;
-        height: 50px;
+        width: 36px;
+        height: 36px;
         border-radius: var(--radius-m);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 15px;
+        margin-right: 10px;
     }
     .stat-icon i { font-size: 20px; color: white; }
     .stat-icon.critical { background: var(--brand-red); }
@@ -376,8 +376,8 @@
     .stat-icon.success { background: var(--green-500); }
     .stat-icon.default { background: var(--gray-500); }
     
-    .stat-value { font-size: 28px; font-weight: bold; display: block; color: var(--gray-900); }
-    .stat-label { font-size: 13px; color: var(--gray-600); }
+    .stat-value { font-size: 20px; font-weight: bold; display: block; color: var(--gray-900); }
+    .stat-label { font-size: 11px; color: var(--gray-600); }
 
     .incident-layout {
         display: grid;

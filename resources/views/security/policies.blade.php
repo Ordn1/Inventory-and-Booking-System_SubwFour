@@ -106,7 +106,7 @@
         </div>
         <div class="stat-row">
             <span class="stat-label">Lockout Duration</span>
-            <span class="stat-value">{{ $policies['login']['lockout_minutes'] }} min</span>
+            <span class="stat-value">{{ $policies['login']['lockout_seconds'] }} sec</span>
         </div>
         <div class="stat-row">
             <span class="stat-label">Session Timeout</span>
@@ -239,65 +239,4 @@
         @endforeach
     </div>
 </div>
-
-<style>
-    .security-grid { 
-        display: grid; 
-        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); 
-        gap: 20px; 
-        margin-bottom: 24px; 
-    }
-    .security-card { 
-        background: linear-gradient(135deg, rgba(34,34,34,.78), rgba(24,24,24,.82)); 
-        border: 1px solid var(--gray-300); 
-        border-radius: 14px; 
-        padding: 20px; 
-    }
-    .security-card h4 { 
-        margin: 0 0 16px 0; 
-        font-size: .9rem; 
-        color: var(--gray-700); 
-        text-transform: uppercase; 
-        letter-spacing: .5px; 
-        border-bottom: 1px solid var(--gray-350); 
-        padding-bottom: 10px; 
-    }
-    .security-card h4 i {
-        color: var(--brand-red);
-        margin-right: 8px;
-    }
-    .stat-row { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        padding: 8px 0; 
-        border-bottom: 1px solid var(--gray-300); 
-    }
-    .stat-row:last-child { border-bottom: none; }
-    .stat-label { 
-        color: var(--gray-600); 
-        font-size: .85rem; 
-    }
-    .stat-value { 
-        font-weight: 600; 
-        color: var(--gray-900); 
-        font-size: .9rem; 
-    }
-    .stat-value.success { color: var(--green-500); }
-    .stat-value.danger { color: var(--brand-red); }
-    .stat-value.warning { color: var(--yellow-500); }
-    .stat-value.info { color: var(--blue-500); }
-    .badge { 
-        display: inline-block; 
-        padding: 3px 8px; 
-        border-radius: 4px; 
-        font-size: .7rem; 
-        font-weight: 600; 
-        text-transform: uppercase; 
-    }
-    .badge-success { background: rgba(34,197,94,.15); color: var(--green-500); }
-    .badge-danger { background: rgba(239,53,53,.15); color: var(--brand-red); }
-    .badge-warning { background: rgba(234,179,8,.15); color: var(--yellow-500); }
-    .badge-info { background: rgba(59,130,246,.15); color: var(--blue-500); }
-</style>
 @endsection

@@ -4,10 +4,6 @@
 
 @section('head')
     <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
-    <style>
-        .pagination-wrapper nav ul { justify-content: center; }
-        .pagination-wrapper nav { display: flex; justify-content: center; }
-    </style>
 @endsection
 
 @section('content')
