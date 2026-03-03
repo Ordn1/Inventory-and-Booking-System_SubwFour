@@ -33,8 +33,9 @@
                 <li><a href="{{ route('system_logs.index') }}" class="nav-link"><i class="bi bi-journal-text"></i> System Logs</a></li>
             @elseif($user->role === 'security')
                 {{-- Security navigation --}}
-                <li><a href="{{ route('employee.dashboard') }}" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="{{ route('security.dashboard') }}" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
                 <li><a href="{{ route('security.index') }}" class="nav-link"><i class="bi bi-shield-lock"></i> Security</a></li>
+                <li><a href="{{ route('security.policies') }}" class="nav-link"><i class="bi bi-file-earmark-lock"></i> Policies</a></li>
                 <li><a href="{{ route('incidents.index') }}" class="nav-link"><i class="bi bi-exclamation-triangle"></i> Incidents</a></li>
                 <li><a href="{{ route('system_logs.index') }}" class="nav-link"><i class="bi bi-journal-text"></i> System Logs</a></li>
             @else

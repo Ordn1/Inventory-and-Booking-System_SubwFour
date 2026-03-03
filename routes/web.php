@@ -21,6 +21,7 @@ use App\Http\Controllers\SystemLogsController;
 use App\Http\Controllers\PasswordController; 
 use App\Http\Controllers\EmployeeDashboardController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\SecurityDashboardController;
 
 Route::get('/', function () {
     return Auth::check()
@@ -57,13 +58,24 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Employee Dashboard Routes (Employee & Security)
+| Employee Dashboard Routes (Employee only)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:employee,security'])->prefix('employee')->group(function () {
+Route::middleware(['auth', 'role:employee'])->prefix('employee')->group(function () {
     Route::get('/dashboard', [EmployeeDashboardController::class, 'index'])->name('employee.dashboard');
     Route::post('/password-change-request', [EmployeeDashboardController::class, 'requestPasswordChange'])->name('employee.password-request');
     Route::delete('/password-change-request', [EmployeeDashboardController::class, 'cancelPasswordRequest'])->name('employee.password-request.cancel');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Security Dashboard Routes (Security role)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:security'])->prefix('security-user')->group(function () {
+    Route::get('/dashboard', [SecurityDashboardController::class, 'index'])->name('security.dashboard');
+    Route::post('/password-change-request', [EmployeeDashboardController::class, 'requestPasswordChange'])->name('security.password-request');
+    Route::delete('/password-change-request', [EmployeeDashboardController::class, 'cancelPasswordRequest'])->name('security.password-request.cancel');
 });
 
 /*

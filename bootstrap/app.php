@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust all proxies (for ngrok/reverse proxy support)
+        $middleware->trustProxies(at: '*');
+        
         // Global middleware (applied to all requests)
         $middleware->prepend(\App\Http\Middleware\ForceHttps::class);
         $middleware->append(\App\Http\Middleware\CheckBlockedIp::class);

@@ -2,432 +2,302 @@
 
 @section('title', 'Security Policies')
 
+@section('head')
+    <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
+@endsection
+
 @section('content')
-<div class="page-header">
-    <div class="header-content">
-        <h1><i class="fas fa-shield-alt"></i> Security Policies</h1>
-        <p>System security policies and compliance documentation</p>
+<div class="emp-welcome-section">
+    <div class="emp-welcome-content">
+        <h2 class="emp-welcome-title">SECURITY POLICIES</h2>
+        <p class="emp-welcome-subtitle">
+            System security policies and compliance documentation
+        </p>
     </div>
-    <div class="header-actions">
-        <a href="{{ route('security.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Security Dashboard
-        </a>
+    <div class="emp-welcome-illustration">
+        <i class="bi bi-shield-lock"></i>
     </div>
 </div>
 
-<!-- Status Overview -->
-<div class="card-grid">
-    <div class="stat-card">
-        <div class="stat-icon bg-info">
-            <i class="fas fa-users"></i>
-        </div>
-        <div class="stat-content">
-            <span class="stat-value">{{ $totalUsers }}</span>
-            <span class="stat-label">Total Users</span>
+<div class="emp-stat-cards">
+    <div class="emp-stat-card emp-stat-total">
+        <div class="emp-stat-icon"><i class="bi bi-people"></i></div>
+        <div class="emp-stat-info">
+            <span class="emp-stat-value">{{ $totalUsers }}</span>
+            <span class="emp-stat-label">Total Users</span>
         </div>
     </div>
-    <div class="stat-card {{ $expiredPasswords > 0 ? 'warning' : '' }}">
-        <div class="stat-icon {{ $expiredPasswords > 0 ? 'bg-warning' : 'bg-success' }}">
-            <i class="fas fa-key"></i>
-        </div>
-        <div class="stat-content">
-            <span class="stat-value">{{ $expiredPasswords }}</span>
-            <span class="stat-label">Expired Passwords</span>
+    <div class="emp-stat-card {{ $expiredPasswords > 0 ? 'emp-stat-inactive' : 'emp-stat-active' }}">
+        <div class="emp-stat-icon"><i class="bi bi-key"></i></div>
+        <div class="emp-stat-info">
+            <span class="emp-stat-value">{{ $expiredPasswords }}</span>
+            <span class="emp-stat-label">Expired Passwords</span>
         </div>
     </div>
-    <div class="stat-card {{ $lockedAccounts > 0 ? 'danger' : '' }}">
-        <div class="stat-icon {{ $lockedAccounts > 0 ? 'bg-danger' : 'bg-success' }}">
-            <i class="fas fa-lock"></i>
-        </div>
-        <div class="stat-content">
-            <span class="stat-value">{{ $lockedAccounts }}</span>
-            <span class="stat-label">Locked Accounts</span>
+    <div class="emp-stat-card {{ $lockedAccounts > 0 ? 'emp-stat-inactive' : 'emp-stat-active' }}">
+        <div class="emp-stat-icon"><i class="bi bi-lock"></i></div>
+        <div class="emp-stat-info">
+            <span class="emp-stat-value">{{ $lockedAccounts }}</span>
+            <span class="emp-stat-label">Locked Accounts</span>
         </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon {{ $lastBackup ? 'bg-success' : 'bg-warning' }}">
-            <i class="fas fa-database"></i>
-        </div>
-        <div class="stat-content">
-            <span class="stat-value">{{ $backupCount }}</span>
-            <span class="stat-label">Backups Available</span>
+    <div class="emp-stat-card emp-stat-recent">
+        <div class="emp-stat-icon"><i class="bi bi-database"></i></div>
+        <div class="emp-stat-info">
+            <span class="emp-stat-value">{{ $backupCount }}</span>
+            <span class="emp-stat-label">Backups</span>
             @if($lastBackup)
-                <small style="color: #666;">Last: {{ $lastBackup }}</small>
+                <small style="color: var(--gray-600); font-size: .65rem;">Last: {{ $lastBackup }}</small>
             @endif
         </div>
     </div>
 </div>
 
-<div class="policies-container">
+<div style="margin-bottom: 20px;">
+    <a href="{{ route('security.index') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Security Dashboard
+    </a>
+</div>
+
+<div class="security-grid">
     <!-- Password Policy -->
-    <div class="policy-card">
-        <div class="policy-header">
-            <h2><i class="fas fa-key"></i> Password Policy</h2>
+    <div class="security-card">
+        <h4><i class="bi bi-key"></i> Password Policy</h4>
+        <div class="stat-row">
+            <span class="stat-label">Minimum Length</span>
+            <span class="stat-value">{{ $policies['password']['min_length'] }} characters</span>
         </div>
-        <div class="policy-body">
-            <table class="policy-table">
-                <tr>
-                    <th>Minimum Length</th>
-                    <td>{{ $policies['password']['min_length'] }} characters</td>
-                </tr>
-                <tr>
-                    <th>Require Uppercase</th>
-                    <td>{{ $policies['password']['require_uppercase'] ? 'Yes' : 'No' }}</td>
-                </tr>
-                <tr>
-                    <th>Require Lowercase</th>
-                    <td>{{ $policies['password']['require_lowercase'] ? 'Yes' : 'No' }}</td>
-                </tr>
-                <tr>
-                    <th>Require Numbers</th>
-                    <td>{{ $policies['password']['require_numbers'] ? 'Yes' : 'No' }}</td>
-                </tr>
-                <tr>
-                    <th>Require Special Characters</th>
-                    <td>{{ $policies['password']['require_special'] ? 'Yes' : 'No' }}</td>
-                </tr>
-                <tr>
-                    <th>Password Expiry</th>
-                    <td>{{ $policies['password']['expiry_days'] }} days</td>
-                </tr>
-                <tr>
-                    <th>Expiry Warning</th>
-                    <td>{{ $policies['password']['warning_days'] }} days before expiration</td>
-                </tr>
-                <tr>
-                    <th>Password History</th>
-                    <td>Cannot reuse last {{ $policies['password']['history_count'] }} passwords</td>
-                </tr>
-            </table>
+        <div class="stat-row">
+            <span class="stat-label">Require Uppercase</span>
+            <span class="stat-value {{ $policies['password']['require_uppercase'] ? 'success' : 'danger' }}">{{ $policies['password']['require_uppercase'] ? 'Yes' : 'No' }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Require Lowercase</span>
+            <span class="stat-value {{ $policies['password']['require_lowercase'] ? 'success' : 'danger' }}">{{ $policies['password']['require_lowercase'] ? 'Yes' : 'No' }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Require Numbers</span>
+            <span class="stat-value {{ $policies['password']['require_numbers'] ? 'success' : 'danger' }}">{{ $policies['password']['require_numbers'] ? 'Yes' : 'No' }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Require Special</span>
+            <span class="stat-value {{ $policies['password']['require_special'] ? 'success' : 'danger' }}">{{ $policies['password']['require_special'] ? 'Yes' : 'No' }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Password Expiry</span>
+            <span class="stat-value">{{ $policies['password']['expiry_days'] }} days</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Expiry Warning</span>
+            <span class="stat-value">{{ $policies['password']['warning_days'] }} days</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Password History</span>
+            <span class="stat-value">{{ $policies['password']['history_count'] }} previous</span>
         </div>
     </div>
 
     <!-- Login Security -->
-    <div class="policy-card">
-        <div class="policy-header">
-            <h2><i class="fas fa-sign-in-alt"></i> Login Security</h2>
+    <div class="security-card">
+        <h4><i class="bi bi-box-arrow-in-right"></i> Login Security</h4>
+        <div class="stat-row">
+            <span class="stat-label">Max Failed Attempts</span>
+            <span class="stat-value">{{ $policies['login']['max_attempts'] }}</span>
         </div>
-        <div class="policy-body">
-            <table class="policy-table">
-                <tr>
-                    <th>Max Failed Attempts</th>
-                    <td>{{ $policies['login']['max_attempts'] }} attempts</td>
-                </tr>
-                <tr>
-                    <th>Lockout Duration</th>
-                    <td>{{ $policies['login']['lockout_minutes'] }} minutes</td>
-                </tr>
-                <tr>
-                    <th>Session Timeout</th>
-                    <td>{{ $policies['login']['session_timeout_minutes'] }} minutes of inactivity</td>
-                </tr>
-                <tr>
-                    <th>Concurrent Sessions</th>
-                    <td>Maximum {{ $policies['login']['max_concurrent_sessions'] }} per user</td>
-                </tr>
-            </table>
+        <div class="stat-row">
+            <span class="stat-label">Lockout Duration</span>
+            <span class="stat-value">{{ $policies['login']['lockout_minutes'] }} min</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Session Timeout</span>
+            <span class="stat-value">{{ $policies['login']['session_timeout_minutes'] }} min</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Max Concurrent Sessions</span>
+            <span class="stat-value">{{ $policies['login']['max_concurrent_sessions'] }}</span>
         </div>
     </div>
 
     <!-- Data Protection -->
-    <div class="policy-card">
-        <div class="policy-header">
-            <h2><i class="fas fa-lock"></i> Data Protection</h2>
+    <div class="security-card">
+        <h4><i class="bi bi-shield-lock"></i> Data Protection</h4>
+        <div class="stat-row">
+            <span class="stat-label">Encryption at Rest</span>
+            <span class="badge badge-success">Enabled</span>
         </div>
-        <div class="policy-body">
-            <table class="policy-table">
-                <tr>
-                    <th>Encryption at Rest</th>
-                    <td>
-                        <span class="badge badge-success">Enabled</span>
-                        <p class="policy-desc">Sensitive fields are encrypted using AES-256-CBC</p>
-                    </th>
-                </tr>
-                <tr>
-                    <th>Encrypted Fields</th>
-                    <td>
-                        @foreach($policies['data']['encrypted_fields'] as $model => $fields)
-                            <strong>{{ $model }}:</strong> {{ implode(', ', $fields) }}<br>
-                        @endforeach
-                    </td>
-                </tr>
-                <tr>
-                    <th>Data Retention - Sessions</th>
-                    <td>{{ $policies['data']['retention']['sessions'] }} days</td>
-                </tr>
-                <tr>
-                    <th>Data Retention - Audit Logs</th>
-                    <td>{{ $policies['data']['retention']['audit_logs'] }} days</td>
-                </tr>
-                <tr>
-                    <th>Data Retention - Security Logs</th>
-                    <td>{{ $policies['data']['retention']['security_logs'] }} days</td>
-                </tr>
-            </table>
+        <div style="padding: 10px 0; border-bottom: 1px solid var(--gray-300);">
+            <span class="stat-label">Encrypted Fields</span>
+            <div style="margin-top: 8px;">
+                @foreach($policies['data']['encrypted_fields'] as $model => $fields)
+                    <div style="margin-bottom: 4px;">
+                        <span style="color: var(--brand-red); font-weight: 600;">{{ $model }}:</span>
+                        <span style="color: var(--gray-700);">{{ implode(', ', $fields) }}</span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Sessions Retention</span>
+            <span class="stat-value">{{ $policies['data']['retention']['sessions'] }} days</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Audit Logs Retention</span>
+            <span class="stat-value">{{ $policies['data']['retention']['audit_logs'] }} days</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Security Logs Retention</span>
+            <span class="stat-value">{{ $policies['data']['retention']['security_logs'] }} days</span>
         </div>
     </div>
 
     <!-- Access Control -->
-    <div class="policy-card">
-        <div class="policy-header">
-            <h2><i class="fas fa-user-shield"></i> Access Control</h2>
-        </div>
-        <div class="policy-body">
-            <h4>Available Roles</h4>
-            <ul class="role-list">
+    <div class="security-card">
+        <h4><i class="bi bi-person-lock"></i> Access Control</h4>
+        <div style="padding: 10px 0; border-bottom: 1px solid var(--gray-300);">
+            <span class="stat-label">Available Roles</span>
+            <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
                 @foreach($policies['access']['roles'] as $role)
-                    <li>
-                        <span class="badge badge-{{ $role === 'admin' ? 'danger' : ($role === 'manager' ? 'warning' : 'info') }}">
-                            {{ ucfirst($role) }}
-                        </span>
-                    </li>
+                    <span class="badge badge-{{ $role === 'admin' ? 'danger' : ($role === 'security' ? 'warning' : 'info') }}">
+                        {{ ucfirst($role) }}
+                    </span>
                 @endforeach
-            </ul>
-            
-            <h4 style="margin-top: 20px;">Admin-Only Routes</h4>
-            <ul class="route-list">
+            </div>
+        </div>
+        <div style="padding: 10px 0;">
+            <span class="stat-label">Admin-Only Routes</span>
+            <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px;">
                 @foreach($policies['access']['admin_only_routes'] as $route)
-                    <li><code>{{ $route }}</code></li>
+                    <code style="font-size: .75rem; background: var(--gray-200); padding: 4px 8px; border-radius: 4px; color: var(--gray-700);">{{ $route }}</code>
                 @endforeach
-            </ul>
+            </div>
         </div>
     </div>
 
     <!-- Backup Policy -->
-    <div class="policy-card">
-        <div class="policy-header">
-            <h2><i class="fas fa-database"></i> Backup Policy</h2>
+    <div class="security-card">
+        <h4><i class="bi bi-hdd"></i> Backup Policy</h4>
+        <div class="stat-row">
+            <span class="stat-label">Backup Frequency</span>
+            <span class="stat-value">{{ ucfirst($policies['backup']['frequency']) }}</span>
         </div>
-        <div class="policy-body">
-            <table class="policy-table">
-                <tr>
-                    <th>Backup Frequency</th>
-                    <td>{{ ucfirst($policies['backup']['frequency']) }}</td>
-                </tr>
-                <tr>
-                    <th>Backup Retention</th>
-                    <td>{{ $policies['backup']['retention_days'] }} days</td>
-                </tr>
-                <tr>
-                    <th>Compression</th>
-                    <td>{{ $policies['backup']['compress'] ? 'Enabled (GZIP)' : 'Disabled' }}</td>
-                </tr>
-                <tr>
-                    <th>Scheduled Time</th>
-                    <td>Daily at 02:00 AM</td>
-                </tr>
-            </table>
-            
-            @if($lastBackup)
-                <div class="backup-status success">
-                    <i class="fas fa-check-circle"></i>
-                    Last backup: {{ $lastBackup }}
-                </div>
-            @else
-                <div class="backup-status warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    No backups found. Run <code>php artisan backup:database</code>
-                </div>
-            @endif
+        <div class="stat-row">
+            <span class="stat-label">Backup Retention</span>
+            <span class="stat-value">{{ $policies['backup']['retention_days'] }} days</span>
         </div>
+        <div class="stat-row">
+            <span class="stat-label">Compression</span>
+            <span class="stat-value {{ $policies['backup']['compress'] ? 'success' : 'danger' }}">{{ $policies['backup']['compress'] ? 'GZIP' : 'Disabled' }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Scheduled Time</span>
+            <span class="stat-value">02:00 AM</span>
+        </div>
+        @if($lastBackup)
+            <div style="margin-top: 12px; padding: 10px; background: rgba(34,197,94,.1); border-radius: 8px; border: 1px solid rgba(34,197,94,.3);">
+                <i class="bi bi-check-circle" style="color: var(--green-500);"></i>
+                <span style="color: var(--green-500); font-size: .85rem;">Last backup: {{ $lastBackup }}</span>
+            </div>
+        @else
+            <div style="margin-top: 12px; padding: 10px; background: rgba(234,179,8,.1); border-radius: 8px; border: 1px solid rgba(234,179,8,.3);">
+                <i class="bi bi-exclamation-triangle" style="color: var(--yellow-500);"></i>
+                <span style="color: var(--yellow-500); font-size: .85rem;">No backups found</span>
+            </div>
+        @endif
     </div>
 
     <!-- Logging & Monitoring -->
-    <div class="policy-card">
-        <div class="policy-header">
-            <h2><i class="fas fa-clipboard-list"></i> Logging & Monitoring</h2>
-        </div>
-        <div class="policy-body">
-            <h4>Logged Events</h4>
-            <ul class="event-list">
+    <div class="security-card">
+        <h4><i class="bi bi-journal-text"></i> Logging & Monitoring</h4>
+        <div style="padding: 10px 0; border-bottom: 1px solid var(--gray-300);">
+            <span class="stat-label">Logged Events</span>
+            <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px;">
                 @foreach($policies['logging']['events'] as $event)
-                    <li><i class="fas fa-check"></i> {{ str_replace('_', ' ', ucfirst($event)) }}</li>
+                    <span style="font-size: .7rem; padding: 4px 8px; background: rgba(34,197,94,.1); border-radius: 4px; color: var(--green-500);">
+                        <i class="bi bi-check"></i> {{ str_replace('_', ' ', ucfirst($event)) }}
+                    </span>
                 @endforeach
-            </ul>
-            
-            <h4 style="margin-top: 20px;">Log Channels</h4>
-            <table class="policy-table">
-                <tr>
-                    <th>Security Channel</th>
-                    <td>{{ $policies['logging']['security_channel'] }} (30 days retention)</td>
-                </tr>
-                <tr>
-                    <th>Audit Channel</th>
-                    <td>{{ $policies['logging']['audit_channel'] }} (90 days retention)</td>
-                </tr>
-            </table>
+            </div>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Security Channel</span>
+            <span class="stat-value">{{ $policies['logging']['security_channel'] }}</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Audit Channel</span>
+            <span class="stat-value">{{ $policies['logging']['audit_channel'] }}</span>
         </div>
     </div>
 
     <!-- Security Headers -->
-    <div class="policy-card">
-        <div class="policy-header">
-            <h2><i class="fas fa-globe"></i> Security Headers</h2>
-        </div>
-        <div class="policy-body">
-            <table class="policy-table">
-                @foreach($policies['headers'] as $header => $value)
-                    <tr>
-                        <th>{{ $header }}</th>
-                        <td><code>{{ is_bool($value) ? ($value ? 'Enabled' : 'Disabled') : $value }}</code></td>
-                    </tr>
-                @endforeach
-            </table>
-        </div>
+    <div class="security-card">
+        <h4><i class="bi bi-globe"></i> Security Headers</h4>
+        @foreach($policies['headers'] as $header => $value)
+            <div class="stat-row">
+                <span class="stat-label">{{ $header }}</span>
+                <span class="stat-value" style="font-family: monospace; font-size: .75rem;">{{ is_bool($value) ? ($value ? 'Enabled' : 'Disabled') : $value }}</span>
+            </div>
+        @endforeach
     </div>
 </div>
 
 <style>
-    .policies-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
+    .security-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); 
+        gap: 20px; 
+        margin-bottom: 24px; 
     }
-    .policy-card {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        overflow: hidden;
+    .security-card { 
+        background: linear-gradient(135deg, rgba(34,34,34,.78), rgba(24,24,24,.82)); 
+        border: 1px solid var(--gray-300); 
+        border-radius: 14px; 
+        padding: 20px; 
     }
-    .policy-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 15px 20px;
+    .security-card h4 { 
+        margin: 0 0 16px 0; 
+        font-size: .9rem; 
+        color: var(--gray-700); 
+        text-transform: uppercase; 
+        letter-spacing: .5px; 
+        border-bottom: 1px solid var(--gray-350); 
+        padding-bottom: 10px; 
     }
-    .policy-header h2 {
-        margin: 0;
-        font-size: 18px;
-    }
-    .policy-header i {
-        margin-right: 10px;
-    }
-    .policy-body {
-        padding: 20px;
-    }
-    .policy-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .policy-table th,
-    .policy-table td {
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-        text-align: left;
-    }
-    .policy-table th {
-        width: 40%;
-        font-weight: 600;
-        color: #333;
-    }
-    .policy-table td {
-        color: #666;
-    }
-    .policy-desc {
-        margin: 5px 0 0 0;
-        font-size: 12px;
-        color: #888;
-    }
-    .badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    .badge-success { background: #28a745; color: white; }
-    .badge-danger { background: #dc3545; color: white; }
-    .badge-warning { background: #ffc107; color: #333; }
-    .badge-info { background: #17a2b8; color: white; }
-    .role-list, .route-list, .event-list {
-        list-style: none;
-        padding: 0;
-        margin: 10px 0;
-    }
-    .role-list li {
-        display: inline-block;
-        margin-right: 10px;
-    }
-    .route-list li, .event-list li {
-        padding: 5px 0;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    .route-list code {
-        background: #f4f4f4;
-        padding: 2px 8px;
-        border-radius: 3px;
-        font-size: 13px;
-    }
-    .event-list i {
-        color: #28a745;
+    .security-card h4 i {
+        color: var(--brand-red);
         margin-right: 8px;
     }
-    .backup-status {
-        margin-top: 15px;
-        padding: 12px;
-        border-radius: 5px;
+    .stat-row { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        padding: 8px 0; 
+        border-bottom: 1px solid var(--gray-300); 
     }
-    .backup-status.success {
-        background: #d4edda;
-        color: #155724;
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { 
+        color: var(--gray-600); 
+        font-size: .85rem; 
     }
-    .backup-status.warning {
-        background: #fff3cd;
-        color: #856404;
+    .stat-value { 
+        font-weight: 600; 
+        color: var(--gray-900); 
+        font-size: .9rem; 
     }
-    .backup-status code {
-        background: rgba(0,0,0,0.1);
-        padding: 2px 6px;
-        border-radius: 3px;
+    .stat-value.success { color: var(--green-500); }
+    .stat-value.danger { color: var(--brand-red); }
+    .stat-value.warning { color: var(--yellow-500); }
+    .stat-value.info { color: var(--blue-500); }
+    .badge { 
+        display: inline-block; 
+        padding: 3px 8px; 
+        border-radius: 4px; 
+        font-size: .7rem; 
+        font-weight: 600; 
+        text-transform: uppercase; 
     }
-    .card-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-    }
-    .stat-card {
-        background: white;
-        border-radius: 8px;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .stat-card.warning {
-        border-left: 4px solid #ffc107;
-    }
-    .stat-card.danger {
-        border-left: 4px solid #dc3545;
-    }
-    .stat-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 15px;
-    }
-    .stat-icon i {
-        font-size: 20px;
-        color: white;
-    }
-    .bg-info { background: #17a2b8; }
-    .bg-success { background: #28a745; }
-    .bg-warning { background: #ffc107; }
-    .bg-danger { background: #dc3545; }
-    .stat-content {
-        display: flex;
-        flex-direction: column;
-    }
-    .stat-value {
-        font-size: 28px;
-        font-weight: bold;
-        color: #333;
-    }
-    .stat-label {
-        font-size: 14px;
-        color: #666;
-    }
+    .badge-success { background: rgba(34,197,94,.15); color: var(--green-500); }
+    .badge-danger { background: rgba(239,53,53,.15); color: var(--brand-red); }
+    .badge-warning { background: rgba(234,179,8,.15); color: var(--yellow-500); }
+    .badge-info { background: rgba(59,130,246,.15); color: var(--blue-500); }
 </style>
 @endsection

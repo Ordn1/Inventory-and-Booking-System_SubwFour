@@ -32,7 +32,7 @@ class CheckRole
             }
             
             if ($userRole === 'security') {
-                return redirect()->route('employee.dashboard')
+                return redirect()->route('security.dashboard')
                     ->with('error', 'You do not have permission to access that page.');
             }
             

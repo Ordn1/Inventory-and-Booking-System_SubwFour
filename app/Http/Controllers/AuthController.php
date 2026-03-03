@@ -15,7 +15,9 @@ class AuthController extends Controller
         if (Auth::check()) {
             if (Auth::user()->role === 'admin') {
                 return redirect()->route('system'); 
-            } elseif (Auth::user()->role === 'employee' || Auth::user()->role === 'security') {
+            } elseif (Auth::user()->role === 'security') {
+                return redirect()->route('security.dashboard'); 
+            } elseif (Auth::user()->role === 'employee') {
                 return redirect()->route('employee.dashboard'); 
             }
         }
@@ -160,9 +162,14 @@ class AuthController extends Controller
             $request->session()->regenerate();
             session(['first_login' => true]);
             
-            $redirectUrl = Auth::user()->role === 'admin' 
-                ? route('system') 
-                : route('employee.dashboard');
+            $role = Auth::user()->role;
+            if ($role === 'admin') {
+                $redirectUrl = route('system');
+            } elseif ($role === 'security') {
+                $redirectUrl = route('security.dashboard');
+            } else {
+                $redirectUrl = route('employee.dashboard');
+            }
 
             return response()->json([
                 'success' => true,

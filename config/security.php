@@ -37,7 +37,7 @@ return [
         'grace_period_days' => 7,
         
         // Warn user X days before expiry
-        'warn_before_days' => 14,
+        'warning_days' => 14,
     ],
 
     /*
@@ -66,7 +66,7 @@ return [
         'captcha_after_attempts' => 3,
         
         // Session timeout in minutes
-        'session_timeout' => 120,
+        'session_timeout_minutes' => 120,
         
         // Allow concurrent sessions
         'allow_concurrent_sessions' => false,
@@ -102,9 +102,12 @@ return [
         // Data retention periods (in days, 0 = indefinite)
         'retention' => [
             'activity_logs' => 365,
+            'audit_logs' => 365,
             'login_attempts' => 90,
             'security_incidents' => 365,
+            'security_logs' => 365,
             'system_logs' => 90,
+            'sessions' => 30,
         ],
         
         // Require encryption for data exports
@@ -121,23 +124,25 @@ return [
     */
 
     'access' => [
+        // Available roles in the system
+        'roles' => ['admin', 'employee', 'security'],
+        
         // Admin-only routes/resources
-        'admin_only' => [
-            'routes' => [
-                'audit_logs.index',
-                'security.index',
-                'system_logs.index',
-                'employees.index',
-                'employees.store',
-                'employees.update',
-                'employees.destroy',
-            ],
-            'features' => [
-                'user_management',
-                'system_configuration',
-                'security_monitoring',
-                'data_export',
-            ],
+        'admin_only_routes' => [
+            'audit_logs.index',
+            'security.index',
+            'system_logs.index',
+            'employees.index',
+            'employees.store',
+            'employees.update',
+            'employees.destroy',
+        ],
+        
+        'admin_only_features' => [
+            'user_management',
+            'system_configuration',
+            'security_monitoring',
+            'data_export',
         ],
         
         // Log unauthorized access attempts
@@ -160,18 +165,22 @@ return [
     'logging' => [
         // Events to log
         'events' => [
-            'login_success' => true,
-            'login_failure' => true,
-            'logout' => true,
-            'password_change' => true,
-            'profile_update' => true,
-            'data_access' => true,
-            'data_create' => true,
-            'data_update' => true,
-            'data_delete' => true,
-            'export_data' => true,
-            'admin_actions' => true,
+            'login_success',
+            'login_failure',
+            'logout',
+            'password_change',
+            'profile_update',
+            'data_access',
+            'data_create',
+            'data_update',
+            'data_delete',
+            'export_data',
+            'admin_actions',
         ],
+        
+        // Log channels
+        'security_channel' => 'security',
+        'audit_channel' => 'audit',
         
         // Log retention in days
         'retention_days' => [
