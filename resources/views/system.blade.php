@@ -24,17 +24,22 @@
     <center>
         <ul>
             @if($user->role === 'admin')
-                {{-- Admin-only navigation --}}
+                {{-- Admin navigation --}}
                 <li><a href="{{ route('system') }}" class="nav-link"><i class="bi bi-activity"></i> Dashboard</a></li>
-                <li><a href="{{ route('reports.index') }}" class="nav-link"><i class="bi bi-bar-chart-line"></i> Reports</a></li>
                 <li><a href="{{ route('audit_logs.index') }}" class="nav-link"><i class="bi bi-list-columns"></i> Audit Logs</a></li>
                 <li><a href="{{ route('employees.index') }}" class="nav-link"><i class="bi bi-people-fill"></i> Employees</a></li>
                 <li><a href="{{ route('security.index') }}" class="nav-link"><i class="bi bi-shield-lock"></i> Security</a></li>
                 <li><a href="{{ route('incidents.index') }}" class="nav-link"><i class="bi bi-exclamation-triangle"></i> Incidents</a></li>
                 <li><a href="{{ route('system_logs.index') }}" class="nav-link"><i class="bi bi-journal-text"></i> System Logs</a></li>
+            @elseif($user->role === 'security')
+                {{-- Security navigation --}}
+                <li><a href="{{ route('employee.dashboard') }}" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="{{ route('security.index') }}" class="nav-link"><i class="bi bi-shield-lock"></i> Security</a></li>
+                <li><a href="{{ route('incidents.index') }}" class="nav-link"><i class="bi bi-exclamation-triangle"></i> Incidents</a></li>
+                <li><a href="{{ route('system_logs.index') }}" class="nav-link"><i class="bi bi-journal-text"></i> System Logs</a></li>
             @else
-                {{-- Employee-only navigation --}}
-                <li><a href="{{ route('employee.dashboard') }}" class="nav-link"><i class="bi bi-activity"></i> Dashboard</a></li>
+                {{-- Employee navigation --}}
+                <li><a href="{{ route('employee.dashboard') }}" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
                 <li><a href="{{ route('stock_in.index') }}" class="nav-link"><i class="bi bi-dropbox"></i> Stock-In</a></li>
                 <li><a href="{{ route('inventory.index') }}" class="nav-link"><i class="bi bi-inboxes-fill"></i> Inventory</a></li>
                 <li><a href="{{ route('services.index') }}" class="nav-link"><i class="bi bi-wrench"></i> Service</a></li>
@@ -54,7 +59,7 @@
     <div class="user-profile" id="userProfile">
         <span>Welcome, {{ $user->name }}!</span>
         <div class="profile-picture" id="profileTrigger">
-            <img src="{{ $user->role === 'employee'
+            <img src="{{ in_array($user->role, ['employee', 'security'])
                 ? asset('images/EmployeeProfile.png')
                 : asset('images/' . $profilePicture) }}" alt="Profile Picture">
         </div>
@@ -122,7 +127,7 @@
                         </div>
                     </div>
 
-                    @if($user->role === 'employee' && $user->employee)
+                    @if(in_array($user->role, ['employee', 'security']) && $user->employee)
                     <div class="fb-profile-section">
                         <h4 class="fb-profile-section-title">
                             <i class="bi bi-person-lines-fill"></i> Personal Details
@@ -176,6 +181,17 @@
                                     <label>Email Address <span class="required">*</span></label>
                                     <input type="email" name="email" required value="{{ old('email') }}" placeholder="employee@example.com">
                                 </div>
+                            </div>
+                            <div class="emp-form-row emp-form-row-2">
+                                <div class="emp-form-group">
+                                    <label>Role <span class="required">*</span></label>
+                                    <select name="role" required class="emp-form-select">
+                                        <option value="employee" {{ old('role') === 'employee' ? 'selected' : '' }}>Employee</option>
+                                        <option value="security" {{ old('role') === 'security' ? 'selected' : '' }}>Security</option>
+                                    </select>
+                                    <small>Select user access level</small>
+                                </div>
+                                <div class="emp-form-group"></div>
                             </div>
                             <div class="emp-form-row emp-form-row-2">
                                 <div class="emp-form-group">

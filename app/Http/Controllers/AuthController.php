@@ -15,7 +15,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             if (Auth::user()->role === 'admin') {
                 return redirect()->route('system'); 
-            } elseif (Auth::user()->role === 'employee') {
+            } elseif (Auth::user()->role === 'employee' || Auth::user()->role === 'security') {
                 return redirect()->route('employee.dashboard'); 
             }
         }
@@ -24,11 +24,12 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'name' => 'required|string',
             'password' => 'required|string',
         ]);
 
+        $credentials = $request->only(['name', 'password']);
         $username = $credentials['name'];
         $ipAddress = $request->ip();
 
@@ -49,47 +50,42 @@ class AuthController extends Controller
                 ['username' => $username, 'remaining_minutes' => $lockoutInfo['remaining_minutes']]
             );
             
-            return back()->withErrors([
-                'name' => "Too many failed login attempts. Please try again in {$lockoutInfo['remaining_minutes']} minute(s).",
-            ])->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => "Too many failed login attempts. Please try again in {$lockoutInfo['remaining_minutes']} minute(s).",
+            ], 429);
         }
 
-        if (Auth::attempt($credentials)) {
+        // Validate credentials without logging in
+        if (Auth::validate($credentials)) {
             // Check if user account is active
-            if (!Auth::user()->isActive()) {
-                Auth::logout();
-                $request->session()->invalidate();
-                
-                // Log deactivated account login attempt
+            $user = \App\Models\User::where('name', $username)->first();
+            
+            if (!$user->isActive()) {
                 SystemLog::security(
                     "Deactivated account login attempt: {$username}",
                     'user.login.deactivated',
                     ['username' => $username]
                 );
                 
-                return back()->withErrors([
-                    'name' => 'Your account has been deactivated. Please contact the administrator.',
-                ])->withInput();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your account has been deactivated. Please contact the administrator.',
+                ], 403);
             }
 
-            // Record successful login
-            LoginAttempt::recordSuccess(Auth::id(), $username);
-            
-            // Log successful login to system logs
-            SystemLog::audit(
-                "User {$username} logged in successfully",
-                'user.login',
-                ['role' => Auth::user()->role]
-            );
-            
-            $request->session()->regenerate();
-            session(['first_login' => true]);
-            
-            if (Auth::user()->role === 'admin') {
-                return redirect()->route('system');
-            } elseif (Auth::user()->role === 'employee') {
-                return redirect()->route('employee.dashboard');
-            }
+            // Store credentials in session for captcha verification step
+            session(['pending_login' => [
+                'name' => $username,
+                'password' => $credentials['password'],
+                'ip' => $ipAddress,
+            ]]);
+
+            return response()->json([
+                'success' => true,
+                'require_captcha' => true,
+                'message' => 'Credentials verified. Please complete captcha.',
+            ]);
         }
 
         // Record failed login attempt
@@ -116,9 +112,71 @@ class AuthController extends Controller
             $errorMessage .= " Warning: {$remainingAttempts} attempt(s) remaining before account lockout.";
         }
 
-        return back()->withErrors([
-            'name' => $errorMessage,
-        ])->withInput();
+        return response()->json([
+            'success' => false,
+            'message' => $errorMessage,
+        ], 401);
+    }
+
+    /**
+     * Verify captcha and complete login
+     */
+    public function verifyCaptcha(Request $request)
+    {
+        $request->validate([
+            'captcha' => 'required|captcha',
+        ], [
+            'captcha.captcha' => 'Invalid captcha code. Please try again.',
+        ]);
+
+        $pendingLogin = session('pending_login');
+
+        if (!$pendingLogin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Session expired. Please login again.',
+            ], 400);
+        }
+
+        $credentials = [
+            'name' => $pendingLogin['name'],
+            'password' => $pendingLogin['password'],
+        ];
+
+        if (Auth::attempt($credentials)) {
+            // Clear pending login from session
+            session()->forget('pending_login');
+
+            // Record successful login
+            LoginAttempt::recordSuccess(Auth::id(), $pendingLogin['name']);
+            
+            // Log successful login to system logs
+            SystemLog::audit(
+                "User {$pendingLogin['name']} logged in successfully",
+                'user.login',
+                ['role' => Auth::user()->role]
+            );
+            
+            $request->session()->regenerate();
+            session(['first_login' => true]);
+            
+            $redirectUrl = Auth::user()->role === 'admin' 
+                ? route('system') 
+                : route('employee.dashboard');
+
+            return response()->json([
+                'success' => true,
+                'redirect' => $redirectUrl,
+            ]);
+        }
+
+        // Clear pending login on failure
+        session()->forget('pending_login');
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Authentication failed. Please try again.',
+        ], 401);
     }
 
     public function logout(Request $request)

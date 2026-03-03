@@ -90,6 +90,7 @@ class EmployeeController extends Controller
             'name'            => ['required','string','max:100'],
             'email'           => ['required','email','max:150','unique:users,email'],
             'password'        => ['required','confirmed', new EmployeePassword],
+            'role'            => ['required','string','in:employee,security'],
             'first_name'      => ['required','string','max:80'],
             'last_name'       => ['required','string','max:80'],
             'address'         => ['required','string','max:255'],
@@ -105,7 +106,7 @@ class EmployeeController extends Controller
                 'name'     => $data['name'],
                 'email'    => $data['email'],
                 'password' => $data['password'],
-                'role'     => 'employee',
+                'role'     => $data['role'],
                 'is_active' => true,
             ]);
 

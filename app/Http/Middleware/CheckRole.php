@@ -27,7 +27,12 @@ class CheckRole
         if (!in_array($userRole, $roles)) {
             // Redirect based on user's actual role
             if ($userRole === 'employee') {
-                return redirect()->route('inventory.index')
+                return redirect()->route('employee.dashboard')
+                    ->with('error', 'You do not have permission to access that page.');
+            }
+            
+            if ($userRole === 'security') {
+                return redirect()->route('employee.dashboard')
                     ->with('error', 'You do not have permission to access that page.');
             }
             

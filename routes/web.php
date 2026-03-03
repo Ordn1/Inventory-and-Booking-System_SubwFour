@@ -20,6 +20,7 @@ use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SystemLogsController;
 use App\Http\Controllers\PasswordController; 
 use App\Http\Controllers\EmployeeDashboardController;
+use App\Http\Controllers\ForgotPasswordController;
 
 Route::get('/', function () {
     return Auth::check()
@@ -29,7 +30,20 @@ Route::get('/', function () {
 
 Route::get('/login',  [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post')->middleware('rate.limit:10,1');
+Route::post('/login/verify-captcha', [AuthController::class, 'verifyCaptcha'])->name('login.verify-captcha');
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| Forgot Password / OTP Reset Routes
+|--------------------------------------------------------------------------
+*/
+Route::get('/password/forgot', [ForgotPasswordController::class, 'showForgotForm'])->name('password.forgot');
+Route::post('/password/send-otp', [ForgotPasswordController::class, 'sendOtp'])->name('password.send-otp');
+Route::get('/password/verify-otp', [ForgotPasswordController::class, 'showVerifyOtpForm'])->name('password.verify-otp.form');
+Route::post('/password/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name('password.verify-otp');
+Route::get('/password/reset', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset.form');
+Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword'])->name('password.reset');
 
 /*
 |--------------------------------------------------------------------------
@@ -43,10 +57,10 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Employee Dashboard Routes
+| Employee Dashboard Routes (Employee & Security)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:employee'])->prefix('employee')->group(function () {
+Route::middleware(['auth', 'role:employee,security'])->prefix('employee')->group(function () {
     Route::get('/dashboard', [EmployeeDashboardController::class, 'index'])->name('employee.dashboard');
     Route::post('/password-change-request', [EmployeeDashboardController::class, 'requestPasswordChange'])->name('employee.password-request');
     Route::delete('/password-change-request', [EmployeeDashboardController::class, 'cancelPasswordRequest'])->name('employee.password-request.cancel');
@@ -129,18 +143,18 @@ Route::middleware('auth')->group(function () {
         Route::post('/bookings/{booking}/appoint',  [BookingController::class,'appoint'])->name('bookings.appoint');
     });
 
-    // Reports (Monthly analytics - accessible by all)
-    Route::get('/reports',                      [ReportsController::class,'index'])->name('reports.index');
+    // Reports (Employee only)
+    Route::get('/reports',                      [ReportsController::class,'index'])->name('reports.index')->middleware('role:employee');
 
     // Audit Logs (Admin only)
     Route::get('/audit-logs',                   [AuditLogsController::class,'index'])->name('audit_logs.index')->middleware('role:admin');
 
-    // Security Dashboard (Admin only)
-    Route::get('/security',                     [SecurityController::class,'index'])->name('security.index')->middleware('role:admin');
-    Route::get('/security/policies',            [SecurityController::class,'policies'])->name('security.policies')->middleware('role:admin');
+    // Security Dashboard (Admin & Security)
+    Route::get('/security',                     [SecurityController::class,'index'])->name('security.index')->middleware('role:admin,security');
+    Route::get('/security/policies',            [SecurityController::class,'policies'])->name('security.policies')->middleware('role:admin,security');
 
-    // Incident Response (Admin only)
-    Route::prefix('incidents')->middleware('role:admin')->group(function () {
+    // Incident Response (Admin & Security)
+    Route::prefix('incidents')->middleware('role:admin,security')->group(function () {
         Route::get('/',                           [\App\Http\Controllers\IncidentResponseController::class, 'index'])->name('incidents.index');
         Route::get('/report',                     [\App\Http\Controllers\IncidentResponseController::class, 'report'])->name('incidents.report');
         Route::get('/blocklist',                  [\App\Http\Controllers\IncidentResponseController::class, 'blocklist'])->name('incidents.blocklist');
@@ -154,10 +168,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/force-password/{user}',     [\App\Http\Controllers\IncidentResponseController::class, 'forcePasswordReset'])->name('incidents.force-password');
     });
 
-    // System Logs (Admin only)
-    Route::get('/system-logs',                  [SystemLogsController::class,'index'])->name('system_logs.index')->middleware('role:admin');
-    Route::get('/system-logs/{systemLog}',      [SystemLogsController::class,'show'])->name('system_logs.show')->middleware('role:admin');
-    Route::get('/system-logs-export',           [SystemLogsController::class,'export'])->name('system_logs.export')->middleware('role:admin');
+    // System Logs (Admin & Security)
+    Route::get('/system-logs',                  [SystemLogsController::class,'index'])->name('system_logs.index')->middleware('role:admin,security');
+    Route::get('/system-logs/{systemLog}',      [SystemLogsController::class,'show'])->name('system_logs.show')->middleware('role:admin,security');
+    Route::get('/system-logs-export',           [SystemLogsController::class,'export'])->name('system_logs.export')->middleware('role:admin,security');
 
     // Password Management (Admin only)
     Route::post('/users/{user}/force-password-change', [PasswordController::class, 'forceChange'])
