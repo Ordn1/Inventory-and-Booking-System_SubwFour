@@ -19,6 +19,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'is_active',
         'password_changed_at',
         'must_change_password',
         'failed_login_count',
@@ -37,6 +38,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'password_changed_at' => 'datetime',
             'must_change_password' => 'boolean',
+            'is_active' => 'boolean',
             'locked_until' => 'datetime',
         ];
     }
@@ -55,6 +57,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user account is active
+     */
+    public function isActive(): bool
+    {
+        return $this->is_active ?? true;
+    }
+
+    /**
      * Check if user account is locked
      */
     public function isLocked(): bool
@@ -67,7 +77,7 @@ class User extends Authenticatable
      */
     public function isPasswordExpired(): bool
     {
-        $expiryDays = config('security.password.expiry_days', 90);
+        $expiryDays = (int) config('security.password.expiry_days', 90);
         
         if (!$this->password_changed_at) {
             return true; // Never changed, consider expired
@@ -148,7 +158,7 @@ class User extends Authenticatable
             return 0;
         }
 
-        $expiryDays = config('security.password.expiry_days', 90);
+        $expiryDays = (int) config('security.password.expiry_days', 90);
         $expiryDate = $this->password_changed_at->addDays($expiryDays);
         
         if ($expiryDate->isPast()) {

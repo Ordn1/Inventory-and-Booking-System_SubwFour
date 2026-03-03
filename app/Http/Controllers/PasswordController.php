@@ -8,6 +8,7 @@ use Illuminate\Validation\Rules\Password;
 use App\Models\PasswordHistory;
 use App\Models\SystemLog;
 use App\Rules\StrongPassword;
+use App\Rules\EmployeePassword;
 
 class PasswordController extends Controller
 {
@@ -32,35 +33,69 @@ class PasswordController extends Controller
      */
     public function change(Request $request)
     {
-        $request->validate([
+        $user = auth()->user();
+        $isAjax = $request->ajax() || $request->wantsJson();
+        
+        // Use EmployeePassword rule for employees, StrongPassword for admins
+        $passwordRule = $user->role === 'employee' 
+            ? new EmployeePassword() 
+            : new StrongPassword();
+
+        $validator = validator($request->all(), [
             'current_password' => ['required', 'current_password'],
             'password' => [
                 'required',
                 'confirmed',
-                new StrongPassword(),
+                $passwordRule,
             ],
         ]);
 
-        $user = auth()->user();
+        if ($validator->fails()) {
+            if ($isAjax) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()->toArray()
+                ], 422);
+            }
+            return back()->withErrors($validator);
+        }
+
         $newPassword = $request->password;
 
         // Check if new password was used before
         if (PasswordHistory::wasUsedBefore($user->id, $newPassword)) {
             $historyCount = config('security.password.history_count', 5);
-            return back()->withErrors([
-                'password' => "You cannot reuse any of your last {$historyCount} passwords.",
-            ]);
+            $error = "You cannot reuse any of your last {$historyCount} passwords.";
+            if ($isAjax) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['password' => [$error]]
+                ], 422);
+            }
+            return back()->withErrors(['password' => $error]);
         }
 
         // Check if new password is same as current
         if (Hash::check($newPassword, $user->password)) {
-            return back()->withErrors([
-                'password' => 'New password must be different from current password.',
-            ]);
+            $error = 'New password must be different from current password.';
+            if ($isAjax) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['password' => [$error]]
+                ], 422);
+            }
+            return back()->withErrors(['password' => $error]);
         }
 
         // Update password with history tracking
         $user->updatePassword($newPassword);
+
+        // Delete the approved password change request (if employee)
+        if ($user->role === 'employee') {
+            \App\Models\PasswordChangeRequest::where('user_id', $user->id)
+                ->where('status', 'approved')
+                ->delete();
+        }
 
         // Log the password change
         SystemLog::security('Password changed successfully', 'password_change', [
@@ -68,7 +103,14 @@ class PasswordController extends Controller
             'user_email' => $user->email,
         ]);
 
-        return redirect()->route('dashboard')
+        if ($isAjax) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Your password has been changed successfully.'
+            ]);
+        }
+
+        return redirect()->route('system')
             ->with('success', 'Your password has been changed successfully.');
     }
 

@@ -54,7 +54,9 @@
     /* =============== MODALS =============== */
     function openModal(modal) {
         if (!modal) return;
+        // Handle both .modal.hidden pattern and .app-modal pattern
         modal.classList.remove('hidden');
+        modal.classList.remove('hide');
         requestAnimationFrame(() => modal.classList.add('show'));
         document.body.style.overflow = 'hidden';
         const first = modal.querySelector('input:not([type=hidden]), textarea, select, button');
@@ -69,8 +71,12 @@
         if (!modal) return;
         modal.classList.remove('show');
         setTimeout(() => {
-            modal.classList.add('hidden');
-            if (!qsa('.modal.show').length) document.body.style.overflow = '';
+            // For .modal.hidden pattern, add hidden class
+            if (modal.classList.contains('modal')) {
+                modal.classList.add('hidden');
+            }
+            // For .app-modal pattern, it hides via CSS (display:none when no .show)
+            if (!qsa('.modal.show, .app-modal.show').length) document.body.style.overflow = '';
         }, 200);
     }
     function openModalById(id) { openModal(qs('#' + id)); }
@@ -102,23 +108,25 @@
                 }
             }
 
-            const closeBtn = e.target.closest('[data-close], .close-btn');
+            const closeBtn = e.target.closest('[data-close], .close-btn, .emp-modal-close, .emp-profile-close');
             if (closeBtn) {
-                const modal = closeBtn.closest('.modal');
+                const modal = closeBtn.closest('.modal, .app-modal');
                 if (modal) closeModal(modal);
             }
         });
 
-        // Backdrop click
+        // Backdrop click - handle both .modal and .app-modal
         document.addEventListener('mousedown', e => {
-            const content = e.target.closest('.modal-content');
-            const modal = e.target.closest('.modal');
+            const content = e.target.closest('.modal-content, .app-modal-content');
+            const modal = e.target.closest('.modal, .app-modal');
             if (modal && !content) closeModal(modal);
         });
 
-        // ESC closes all
+        // ESC closes all - handle both .modal and .app-modal
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') qsa('.modal.show').forEach(m => closeModal(m));
+            if (e.key === 'Escape') {
+                qsa('.modal.show, .app-modal.show').forEach(m => closeModal(m));
+            }
         });
 
         // Auto-open (validation errors)
@@ -140,6 +148,154 @@
             img.src = URL.createObjectURL(f);
             wrap.style.display = 'block';
         });
+    }
+
+    /* =============== EMPLOYEE FORM VALIDATION & AJAX =============== */
+    function initEmployeeFormValidation() {
+        const contactInput = qs('#empContactNumber');
+        const sssInput = qs('#empSSSNumber');
+        const form = qs('#employeeCreateForm');
+        const errorsDiv = qs('#employeeFormErrors');
+        const successDiv = qs('#employeeFormSuccess');
+        const submitBtn = qs('#employeeSubmitBtn');
+
+        // Contact Number: digits only, max 11
+        if (contactInput) {
+            contactInput.addEventListener('input', function(e) {
+                // Remove any non-digit characters
+                let value = this.value.replace(/\D/g, '');
+                // Limit to 11 digits
+                if (value.length > 11) value = value.substring(0, 11);
+                this.value = value;
+            });
+            contactInput.addEventListener('keypress', function(e) {
+                // Only allow digit keys
+                if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
+            // Prevent paste of non-numeric content
+            contactInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const paste = (e.clipboardData || window.clipboardData).getData('text');
+                const digits = paste.replace(/\D/g, '').substring(0, 11);
+                this.value = digits;
+            });
+        }
+
+        // SSS Number: auto-format XX-XXXXXXX-X
+        if (sssInput) {
+            sssInput.addEventListener('input', function(e) {
+                // Remove any non-digit characters
+                let value = this.value.replace(/\D/g, '');
+                // Limit to 10 digits
+                if (value.length > 10) value = value.substring(0, 10);
+                
+                // Format as XX-XXXXXXX-X
+                let formatted = '';
+                if (value.length > 0) {
+                    formatted = value.substring(0, 2);
+                }
+                if (value.length > 2) {
+                    formatted += '-' + value.substring(2, 9);
+                }
+                if (value.length > 9) {
+                    formatted += '-' + value.substring(9, 10);
+                }
+                this.value = formatted;
+            });
+            sssInput.addEventListener('keypress', function(e) {
+                // Only allow digit keys
+                if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
+            // Prevent paste of non-numeric content
+            sssInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const paste = (e.clipboardData || window.clipboardData).getData('text');
+                let digits = paste.replace(/\D/g, '').substring(0, 10);
+                // Format
+                let formatted = '';
+                if (digits.length > 0) formatted = digits.substring(0, 2);
+                if (digits.length > 2) formatted += '-' + digits.substring(2, 9);
+                if (digits.length > 9) formatted += '-' + digits.substring(9, 10);
+                this.value = formatted;
+            });
+        }
+
+        // Form AJAX submission
+        if (form && errorsDiv && submitBtn) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Hide previous messages
+                errorsDiv.style.display = 'none';
+                successDiv.style.display = 'none';
+                errorsDiv.querySelector('ul').innerHTML = '';
+                
+                // Disable submit button
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Registering...';
+                
+                const formData = new FormData(form);
+                
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json().then(data => ({ ok: true, data }));
+                    } else if (response.status === 422) {
+                        return response.json().then(data => ({ ok: false, data }));
+                    } else {
+                        throw new Error('Server error');
+                    }
+                })
+                .then(result => {
+                    if (result.ok) {
+                        // Success
+                        successDiv.textContent = result.data.message || 'Employee registered successfully!';
+                        successDiv.style.display = 'block';
+                        form.reset();
+                        qs('#createProfilePreview').style.display = 'none';
+                        
+                        // Reload page after short delay to show new employee
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        // Validation errors
+                        const errors = result.data.errors || {};
+                        const errorList = errorsDiv.querySelector('ul');
+                        for (const field in errors) {
+                            errors[field].forEach(msg => {
+                                const li = document.createElement('li');
+                                li.textContent = msg;
+                                errorList.appendChild(li);
+                            });
+                        }
+                        errorsDiv.style.display = 'block';
+                        // Scroll to errors
+                        errorsDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                })
+                .catch(err => {
+                    console.error('Employee form error:', err);
+                    errorsDiv.querySelector('ul').innerHTML = '<li>An unexpected error occurred. Please try again.</li>';
+                    errorsDiv.style.display = 'block';
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Register Employee';
+                });
+            });
+        }
     }
 
     /* =============== ACTIVE NAV HIGHLIGHT =============== */
@@ -265,14 +421,111 @@
         };
     }
 
+    /* =============== EMPLOYEE MODAL HELPERS =============== */
+    function initEmployeeModals() {
+        // View Employee Profile (for employees page - shows selected employee)
+        window.viewEmployeeProfile = function(id) {
+            fetch(`/employees/${id}`, {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const e = data.employee, u = data.user;
+                    const profileModal = qs('#employeeProfileModal');
+                    if (!profileModal) return;
+                    
+                    const avatar = qs('#empProfileAvatar', profileModal);
+                    if (avatar) avatar.src = e.profile_picture 
+                        ? `/storage/${e.profile_picture}` 
+                        : '/images/EmployeeProfile.png';
+                    
+                    const nameEl = qs('#empProfileName', profileModal);
+                    if (nameEl) nameEl.textContent = e.first_name + ' ' + e.last_name;
+                    
+                    const roleEl = qs('#empProfileRole', profileModal);
+                    if (roleEl) {
+                        roleEl.textContent = u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : 'Employee';
+                        roleEl.className = 'emp-badge emp-badge-' + (u.role || 'employee');
+                    }
+                    
+                    const statusEl = qs('#empProfileStatus', profileModal);
+                    if (statusEl) {
+                        statusEl.innerHTML = u.is_active 
+                            ? '<span class="emp-status-dot"></span> Active' 
+                            : '<span class="emp-status-dot"></span> Inactive';
+                        statusEl.className = 'emp-status ' + (u.is_active ? 'emp-status-active' : 'emp-status-inactive');
+                    }
+                    
+                    const emailEl = qs('#empProfileEmail', profileModal);
+                    if (emailEl) emailEl.textContent = u.email || '—';
+                    
+                    const contactEl = qs('#empProfileContact', profileModal);
+                    if (contactEl) contactEl.textContent = e.contact_number || '—';
+                    
+                    const addressEl = qs('#empProfileAddress', profileModal);
+                    if (addressEl) addressEl.textContent = e.address || '—';
+                    
+                    const sssEl = qs('#empProfileSSS', profileModal);
+                    if (sssEl) sssEl.textContent = e.sss_number || '—';
+                    
+                    const regEl = qs('#empProfileRegistered', profileModal);
+                    if (regEl) regEl.textContent = u.created_at 
+                        ? new Date(u.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) 
+                        : '—';
+                    
+                    const editLink = qs('#empProfileEditLink', profileModal);
+                    if (editLink) editLink.href = `/employees/${id}/edit`;
+                    
+                    openModal(profileModal);
+                }
+            })
+            .catch(err => console.error('Error loading employee profile:', err));
+        };
+
+        // Close Employee Profile Modal (employees page)
+        window.closeEmployeeProfileModal = function() {
+            const modal = qs('#employeeProfileModal');
+            if (modal) closeModal(modal);
+        };
+
+        // Legacy function for backward compatibility
+        window.closeViewProfileModal = function() {
+            const modal = qs('#viewProfileModal');
+            if (modal) closeModal(modal);
+        };
+
+        // Confirm Deactivate Employee
+        window.confirmDeactivate = function(id, name) {
+            const nameEl = qs('#deactivateName');
+            if (nameEl) nameEl.textContent = name;
+            
+            const form = qs('#deactivateForm');
+            if (form) form.action = `/employees/${id}/deactivate`;
+            
+            const modal = qs('#deactivateModal');
+            if (modal) openModal(modal);
+        };
+
+        // Close Deactivate Modal
+        window.closeDeactivateModal = function() {
+            const modal = qs('#deactivateModal');
+            if (modal) closeModal(modal);
+        };
+    }
+
+    window._systemUI = { openModalById, openModal, closeModal };
+
     /* =============== INIT =============== */
     document.addEventListener('DOMContentLoaded', () => {
         initSidebar();
         initProfileDropdown();
         initModals();
         initCreateEmployeePreview();
+        initEmployeeFormValidation();
         highlightActiveNav();
         defineStockInInitializer();
+        initEmployeeModals();
 
         // If modal auto-open (validation errors)
         if (qs('#createStockInModal[data-auto-open="true"]')) {
@@ -281,6 +534,4 @@
             }
         }
     });
-
-    window._systemUI = { openModalById, openModal, closeModal };
 })();

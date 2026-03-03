@@ -173,7 +173,7 @@ class IncidentResponseController extends Controller
             'reason' => 'required|string|max:500',
         ]);
 
-        $duration = $request->duration;
+        $duration = (int) $request->duration;
         $user->update([
             'locked_until' => now()->addMinutes($duration),
         ]);
@@ -249,7 +249,7 @@ class IncidentResponseController extends Controller
         ]);
 
         $ip = $request->ip_address;
-        $duration = $request->duration ?? 1440; // Default 24 hours
+        $duration = (int) ($request->duration ?? 1440); // Default 24 hours
 
         // Store in cache as a simple blocklist
         $blocklist = cache()->get('security_ip_blocklist', []);

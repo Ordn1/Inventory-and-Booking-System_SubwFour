@@ -91,7 +91,7 @@ For PDF generation, you can utilize jsPDF or a similar library to generate the r
 In this case, avoid CSV generation, as you’ve explicitly requested a PDF format. We will need a new route for generating and displaying PDF reports.
 
 Role-Based Access (RBAC):
-We will implement the correct Role-Based Access for both Audit Logs and Reports. The Admin will have access to both, while employees will have access only to Reports (viewing the monthly activities, but not the logs).
+We will implement the correct Role-Based Access for Admin and User.
 
 Page Structure & CSS:
 reports.css: As previously mentioned, should follow the structure of pages.css, ensuring that the theme is consistent. You can create this as a separate CSS file, and no other pages should rely on it.

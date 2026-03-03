@@ -250,7 +250,7 @@ class SecurityController extends Controller
         // Get user password stats
         $totalUsers = User::count();
         $expiredPasswords = User::whereNull('password_changed_at')
-            ->orWhere('password_changed_at', '<', now()->subDays($policies['password']['expiry_days']))
+            ->orWhere('password_changed_at', '<', now()->subDays((int) $policies['password']['expiry_days']))
             ->count();
         $lockedAccounts = User::whereNotNull('locked_until')
             ->where('locked_until', '>', now())

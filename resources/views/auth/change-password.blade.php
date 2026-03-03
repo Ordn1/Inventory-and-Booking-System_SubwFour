@@ -176,7 +176,7 @@
                 <li>At least one uppercase letter (A-Z)</li>
                 <li>At least one lowercase letter (a-z)</li>
                 <li>At least one number (0-9)</li>
-                <li>At least one special character (!@#$%^&*)</li>
+                <li>Letters and numbers only (no special characters)</li>
                 <li>Cannot reuse your last {{ config('security.password.history_count', 5) }} passwords</li>
             </ul>
         </div>

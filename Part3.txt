@@ -1,3 +1,112 @@
-Part 3 consists of double checking.
+You are tasked with implementing Part 3: Complete Revision of the Employees Module.
+This revision must improve the Employees page both functionally and visually while strictly preserving the existing system structure.
 
-this part is not done. wait for command focus on part 1 and part 2 for now.
+🎯 OBJECTIVES
+1️⃣ Full Employees Page Revision (UI + Functional Enhancement)
+Redesign and enhance the Employees page with a professional admin-style dashboard layout.
+The Employees page must include:
+
+A. Employee Overview Section
+Add a KPI summary section at the top:
+Total Employees
+Active Employees
+Inactive Employees
+Recently Registered Employees
+Optional: Employees by Role
+⚠️ These must be computed dynamically using existing database data.
+⚠️ Do NOT modify database schema unless absolutely required.
+⚠️ Use existing model relationships.
+
+B. Employee Listing Table (Improved UI)
+Enhance the employee table with:
+Profile picture column
+Name (clickable → opens profile modal)
+Role
+Email
+Status badge (Active / Inactive)
+Date Registered
+Action buttons:
+View Profile
+Deactivate / Reactivate (Admin only)
+⚠️ Status must be visually distinguished (badge colors).
+⚠️ Deactivation must NOT delete records.
+⚠️ Use soft logic (e.g., status column).
+⚠️ Do NOT remove or rewrite existing logic — extend only.
+
+2️⃣ Profile Picture Upload (Optional Feature)
+Add profile picture upload functionality with the following rules:
+Upload is optional.
+If no image is uploaded → default to EmployeeProfile.png
+Store images properly (e.g., storage path consistent with current system).
+
+Validate:
+Image type only (jpg, png, jpeg) SET THE BEST SIZE LIMIT FOR THIS
+Max file size restriction
+Prevent overwriting existing system images.
+Prevent security vulnerabilities (sanitize file names).
+Must NOT break current registration logic.
+
+⚠️ DO NOT change existing registration validation rules unless necessary.
+⚠️ If migration is required, explain why before adding it.
+⚠️ If a column like profile_picture doesn’t exist, add it safely.
+
+3️⃣ View Profile Modal (Complete Redesign)
+Rework the View Profile modal to resemble a Facebook-style profile layout:
+Layout Requirements:
+Large cover/header section
+Circular profile picture
+Employee Name prominently displayed
+Role
+Status badge
+Contact Information section
+Account Information section
+Activity/metadata section (optional)
+
+Technical Constraints:
+Styling must be added ONLY inside system.css
+Do NOT modify existing global CSS files unless absolutely required.
+Modal must remain responsive.
+Modal must not affect other modals in the system.
+
+⚠️ Do NOT replace modal logic.
+⚠️ Only enhance its structure and UI.
+⚠️ Ensure compatibility with current Bootstrap version.
+
+4️⃣ Account Deactivation Logic (Admin Only)
+Admin users must be able to:
+Deactivate employees
+Reactivate employees
+
+Rules:
+Deactivation must not delete employee data.
+Deactivated employees cannot log in.
+Status must reflect immediately in UI.
+Must follow current role-based access logic.
+Add confirmation modal before deactivation.
+
+⚠️ DO NOT alter authentication core logic unless required.
+⚠️ If modifying login checks, do it safely and minimally.
+
+🚫 STRICT RULES (DO NOT VIOLATE)
+❌ DO NOT rewrite or restructure the system architecture.
+❌ DO NOT rename controllers, routes, or models.
+❌ DO NOT remove existing working code.
+❌ DO NOT break existing dependencies.
+❌ DO NOT change URL structure.
+❌ DO NOT alter database relationships unnecessarily.
+❌ DO NOT introduce external UI frameworks.
+
+✅ YOU MAY:
+Add methods inside EmployeeDashboardController
+Add safe migrations if strictly necessary
+Add CSS inside system.css
+Add new Blade components if following current structure
+Add JavaScript only if required for modal enhancement
+
+Provide:
+Explanation of improvements made
+Updated controller additions
+Blade changes
+CSS additions (only what needs to be added)
+Migration (if necessary)
+Step-by-step explanation of how it integrates safely

@@ -19,6 +19,7 @@ use App\Http\Controllers\StockOutController;
 use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SystemLogsController;
 use App\Http\Controllers\PasswordController; 
+use App\Http\Controllers\EmployeeDashboardController;
 
 Route::get('/', function () {
     return Auth::check()
@@ -42,6 +43,17 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| Employee Dashboard Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:employee'])->prefix('employee')->group(function () {
+    Route::get('/dashboard', [EmployeeDashboardController::class, 'index'])->name('employee.dashboard');
+    Route::post('/password-change-request', [EmployeeDashboardController::class, 'requestPasswordChange'])->name('employee.password-request');
+    Route::delete('/password-change-request', [EmployeeDashboardController::class, 'cancelPasswordRequest'])->name('employee.password-request.cancel');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Public Booking Portal
 |--------------------------------------------------------------------------
 */
@@ -60,7 +72,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/system', [DashboardController::class,'index'])->name('system');
 
     // Employees
-    Route::resource('employees', EmployeeController::class)->except(['show','create']);
+    Route::resource('employees', EmployeeController::class)->except(['create']);
+    Route::post('/employees/{employee}/deactivate', [EmployeeController::class, 'deactivate'])->name('employees.deactivate');
+    Route::post('/employees/{employee}/activate', [EmployeeController::class, 'activate'])->name('employees.activate');
 
     // Suppliers (Employee only)
     Route::middleware('role:employee')->group(function () {
@@ -149,6 +163,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/users/{user}/force-password-change', [PasswordController::class, 'forceChange'])
         ->name('users.force_password_change')
         ->middleware('role:admin');
+
+    // Password Change Requests (Admin only)
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/password-requests/{request}/approve', [EmployeeDashboardController::class, 'approvePasswordRequest'])->name('admin.password-request.approve');
+        Route::post('/password-requests/{request}/reject', [EmployeeDashboardController::class, 'rejectPasswordRequest'])->name('admin.password-request.reject');
+    });
 
     // Stock-Out (Employee only)
     Route::middleware('role:employee')->group(function () {

@@ -16,7 +16,7 @@ class AuthController extends Controller
             if (Auth::user()->role === 'admin') {
                 return redirect()->route('system'); 
             } elseif (Auth::user()->role === 'employee') {
-                return redirect()->route('inventory.index'); 
+                return redirect()->route('employee.dashboard'); 
             }
         }
         return view('login.login');
@@ -55,6 +55,23 @@ class AuthController extends Controller
         }
 
         if (Auth::attempt($credentials)) {
+            // Check if user account is active
+            if (!Auth::user()->isActive()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                
+                // Log deactivated account login attempt
+                SystemLog::security(
+                    "Deactivated account login attempt: {$username}",
+                    'user.login.deactivated',
+                    ['username' => $username]
+                );
+                
+                return back()->withErrors([
+                    'name' => 'Your account has been deactivated. Please contact the administrator.',
+                ])->withInput();
+            }
+
             // Record successful login
             LoginAttempt::recordSuccess(Auth::id(), $username);
             
@@ -71,7 +88,7 @@ class AuthController extends Controller
             if (Auth::user()->role === 'admin') {
                 return redirect()->route('system');
             } elseif (Auth::user()->role === 'employee') {
-                return redirect()->route('inventory.index');
+                return redirect()->route('employee.dashboard');
             }
         }
 

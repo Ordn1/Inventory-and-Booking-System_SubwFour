@@ -29,6 +29,7 @@ class Booking extends Model
     protected $casts = [
         'email'          => Encrypted::class,
         'contact_number' => Encrypted::class,
+        'preferred_date' => 'date',
     ];
 
     /**
