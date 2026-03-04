@@ -1,0 +1,17 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    # Level 0-9, higher = stricter (start with 5, increase over time)
+    level: 5
+
+    # Paths to analyze
+    paths:
+        - app/
+
+    # Ignore specific errors (add as needed)
+    ignoreErrors:
+        # Example: - '#Call to an undefined method [a-zA-Z0-9\\_]+::factory\(\)#'
+
+    # Report unmatched ignored errors
+    reportUnmatchedIgnoredErrors: false

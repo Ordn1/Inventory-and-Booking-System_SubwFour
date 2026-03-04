@@ -56,6 +56,13 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "analyse": "./vendor/bin/phpstan analyse --memory-limit=2G",
+        "phpcs": "./vendor/bin/phpcs",
+        "phpcbf": "./vendor/bin/phpcbf",
+        "code-audit": [
+            "@analyse",
+            "@phpcs"
         ]
     },
     "extra": {
