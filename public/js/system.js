@@ -514,6 +514,196 @@
         };
     }
 
+    /* =============== EMPTY FIELD VALIDATION =============== */
+    function initEmptyFieldValidation() {
+        // Selector for forms that should have validation
+        // Excludes search forms, filter forms, and logout form
+        const formSelector = 'form:not(.search-bar):not(.filter-row):not(.month-selector):not([action*="logout"])';
+        
+        // Get display name for a field
+        function getFieldLabel(field) {
+            // Try to find associated label
+            const id = field.id;
+            if (id) {
+                const label = document.querySelector(`label[for="${id}"]`);
+                if (label) {
+                    // Remove asterisk indicator
+                    return label.textContent.replace(/\s*\*\s*$/, '').trim();
+                }
+            }
+            
+            // Try parent label
+            const parentLabel = field.closest('label');
+            if (parentLabel) {
+                const text = parentLabel.textContent.replace(/\s*\*\s*$/, '').trim();
+                if (text) return text;
+            }
+            
+            // Try previous sibling label
+            const prevLabel = field.previousElementSibling;
+            if (prevLabel && prevLabel.tagName === 'LABEL') {
+                return prevLabel.textContent.replace(/\s*\*\s*$/, '').trim();
+            }
+            
+            // Try finding label in parent .form-group or similar
+            const group = field.closest('.form-group, .form-row, .emp-form-group, .emp-field') || field.parentElement;
+            if (group) {
+                const groupLabel = group.querySelector('label');
+                if (groupLabel && groupLabel !== parentLabel) {
+                    return groupLabel.textContent.replace(/\s*\*\s*$/, '').trim();
+                }
+            }
+            
+            // Fallback to placeholder or name
+            if (field.placeholder) return field.placeholder;
+            if (field.name) {
+                // Convert snake_case to Title Case
+                return field.name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            }
+            
+            return 'Required field';
+        }
+        
+        // Get all required fields in a form
+        function getRequiredFields(form) {
+            return qsa('input[required], select[required], textarea[required]', form);
+        }
+        
+        // Get empty required fields
+        function getEmptyFields(form) {
+            return getRequiredFields(form).filter(field => {
+                const value = field.value.trim();
+                return !value;
+            });
+        }
+        
+        // Find submit button in form
+        function findSubmitButton(form) {
+            return form.querySelector('button[type="submit"], input[type="submit"], .btn-primary[type="submit"], button.btn-primary:not([type="button"])');
+        }
+        
+        // Wrap submit button with tooltip container if not already wrapped
+        function wrapSubmitButton(btn) {
+            if (btn.parentElement.classList.contains('submit-btn-wrapper')) {
+                return btn.parentElement;
+            }
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'submit-btn-wrapper';
+            
+            // Preserve button's width style on wrapper
+            const btnWidth = btn.style.width;
+            if (btnWidth) {
+                wrapper.style.width = btnWidth;
+            }
+            
+            btn.parentNode.insertBefore(wrapper, btn);
+            wrapper.appendChild(btn);
+            
+            // Create tooltip element
+            const tooltip = document.createElement('div');
+            tooltip.className = 'submit-tooltip';
+            wrapper.appendChild(tooltip);
+            
+            return wrapper;
+        }
+        
+        // Update submit button state based on form validity
+        function updateSubmitState(form) {
+            const submitBtn = findSubmitButton(form);
+            if (!submitBtn) return;
+            
+            const emptyFields = getEmptyFields(form);
+            const hasEmptyFields = emptyFields.length > 0;
+            
+            if (hasEmptyFields) {
+                submitBtn.disabled = true;
+                
+                const wrapper = wrapSubmitButton(submitBtn);
+                wrapper.classList.add('has-tooltip');
+                
+                const tooltip = wrapper.querySelector('.submit-tooltip');
+                if (tooltip) {
+                    const fieldNames = emptyFields.map(f => getFieldLabel(f));
+                    const uniqueNames = [...new Set(fieldNames)]; // Remove duplicates
+                    tooltip.innerHTML = `<span class="tooltip-title">Please fill in:</span><span class="tooltip-fields">${uniqueNames.join(', ')}</span>`;
+                }
+            } else {
+                submitBtn.disabled = false;
+                
+                if (submitBtn.parentElement.classList.contains('submit-btn-wrapper')) {
+                    submitBtn.parentElement.classList.remove('has-tooltip');
+                }
+            }
+        }
+        
+        // Initialize validation for a form
+        function initFormValidation(form) {
+            // Skip forms without required fields
+            const requiredFields = getRequiredFields(form);
+            if (requiredFields.length === 0) return;
+            
+            // Mark form as initialized
+            if (form.dataset.validationInit === '1') return;
+            form.dataset.validationInit = '1';
+            
+            // Initial state check
+            updateSubmitState(form);
+            
+            // Add input listeners to all required fields
+            requiredFields.forEach(field => {
+                field.addEventListener('input', () => updateSubmitState(form));
+                field.addEventListener('change', () => updateSubmitState(form));
+            });
+        }
+        
+        // Initialize all forms on page
+        function initAllForms() {
+            qsa(formSelector).forEach(form => initFormValidation(form));
+        }
+        
+        // Run on page load
+        initAllForms();
+        
+        // Also re-check when modals open (for dynamically shown forms)
+        const originalOpenModal = window._systemUI?.openModal;
+        if (originalOpenModal) {
+            window._systemUI.openModal = function(modal) {
+                originalOpenModal(modal);
+                // Initialize forms inside the modal after it opens
+                setTimeout(() => {
+                    qsa(formSelector, modal).forEach(form => {
+                        // Re-initialize in case form wasn't visible before
+                        form.dataset.validationInit = '0';
+                        initFormValidation(form);
+                    });
+                }, 50);
+            };
+        }
+        
+        // Observe for dynamically added forms
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1) { // Element node
+                        if (node.matches && node.matches(formSelector)) {
+                            initFormValidation(node);
+                        }
+                        // Check children
+                        if (node.querySelectorAll) {
+                            qsa(formSelector, node).forEach(form => initFormValidation(form));
+                        }
+                    }
+                });
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        
+        // Expose for manual re-initialization
+        window._initFormValidation = initFormValidation;
+        window._updateSubmitState = updateSubmitState;
+    }
+
     window._systemUI = { openModalById, openModal, closeModal };
 
     /* =============== INIT =============== */
@@ -526,6 +716,7 @@
         highlightActiveNav();
         defineStockInInitializer();
         initEmployeeModals();
+        initEmptyFieldValidation();
 
         // If modal auto-open (validation errors)
         if (qs('#createStockInModal[data-auto-open="true"]')) {

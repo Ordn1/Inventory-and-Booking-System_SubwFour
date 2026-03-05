@@ -770,3 +770,77 @@ textarea:focus-visible {
     .mini-nav { display:none; }
     .top-cta { margin-left:auto; }
 }
+
+/* =============== FORM VALIDATION - DISABLED SUBMIT BUTTONS =============== */
+.btn:disabled,
+button[type="submit"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none !important;
+}
+
+/* Wrapper for disabled button with tooltip */
+.submit-btn-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.submit-btn-wrapper.has-tooltip {
+    cursor: not-allowed;
+}
+
+.submit-btn-wrapper.has-tooltip .btn:disabled,
+.submit-btn-wrapper.has-tooltip button[type="submit"]:disabled {
+    pointer-events: none;
+}
+
+/* Tooltip styles */
+.submit-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    color: #f5f7fa;
+    padding: 10px 14px;
+    border-radius: var(--portal-radius, 12px);
+    font-size: 0.75rem;
+    font-weight: 500;
+    max-width: 280px;
+    white-space: normal;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 1000;
+    line-height: 1.4;
+}
+
+.submit-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1a1a1a;
+}
+
+.submit-btn-wrapper.has-tooltip:hover .submit-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.submit-tooltip .tooltip-title {
+    font-weight: 600;
+    color: var(--portal-accent, #e02626);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.submit-tooltip .tooltip-fields {
+    color: #b2b4b8;
+}

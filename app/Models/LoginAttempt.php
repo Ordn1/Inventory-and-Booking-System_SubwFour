@@ -92,11 +92,15 @@ class LoginAttempt extends Model
     /**
      * Check if a username/IP is locked out due to too many failed attempts
      * 
+     * Username and IP are checked SEPARATELY:
+     * - Username lockout: only affects that specific username
+     * - IP lockout: only affects that IP (e.g., if it tries many different accounts)
+     * 
      * @param string|null $username
      * @param string|null $ip
      * @param int $maxAttempts Maximum failed attempts before lockout
      * @param int $lockoutSeconds Seconds to lock out after max attempts
-     * @return array ['locked' => bool, 'remaining_seconds' => int|null, 'attempts' => int]
+     * @return array ['locked' => bool, 'remaining_seconds' => int|null, 'attempts' => int, 'reason' => string|null]
      */
     public static function isLockedOut(?string $username, ?string $ip = null, ?int $maxAttempts = null, ?int $lockoutSeconds = null): array
     {
@@ -106,43 +110,73 @@ class LoginAttempt extends Model
         $ip = $ip ?? request()->ip();
         $lockoutTime = now()->subSeconds($lockoutSeconds);
         
-        // Count failed attempts for this username OR IP within lockout window
-        $failedAttempts = static::failed()
-            ->where('attempted_at', '>=', $lockoutTime)
-            ->where(function ($query) use ($username, $ip) {
-                $query->where('username', $username)
-                      ->orWhere('ip_address', $ip);
-            })
-            ->count();
-        
-        if ($failedAttempts >= $maxAttempts) {
-            // Get the most recent failed attempt to calculate remaining lockout time
-            $lastAttempt = static::failed()
-                ->where(function ($query) use ($username, $ip) {
-                    $query->where('username', $username)
-                          ->orWhere('ip_address', $ip);
-                })
-                ->latest('attempted_at')
-                ->first();
+        // Check username lockout (specific to this username only)
+        $usernameAttempts = 0;
+        $usernameLockedUntil = null;
+        if ($username) {
+            $usernameAttempts = static::failed()
+                ->where('attempted_at', '>=', $lockoutTime)
+                ->where('username', $username)
+                ->count();
             
-            if ($lastAttempt) {
-                $unlockTime = $lastAttempt->attempted_at->addSeconds($lockoutSeconds);
-                $remainingSeconds = (int) now()->diffInSeconds($unlockTime, false);
+            if ($usernameAttempts >= $maxAttempts) {
+                $lastUsernameAttempt = static::failed()
+                    ->where('username', $username)
+                    ->latest('attempted_at')
+                    ->first();
                 
-                if ($remainingSeconds > 0) {
-                    return [
-                        'locked' => true,
-                        'remaining_seconds' => $remainingSeconds,
-                        'attempts' => $failedAttempts,
-                    ];
+                if ($lastUsernameAttempt) {
+                    $usernameLockedUntil = $lastUsernameAttempt->attempted_at->addSeconds($lockoutSeconds);
                 }
             }
         }
         
+        // Check IP lockout (specific to this IP only)
+        $ipAttempts = static::failed()
+            ->where('attempted_at', '>=', $lockoutTime)
+            ->where('ip_address', $ip)
+            ->count();
+        
+        $ipLockedUntil = null;
+        if ($ipAttempts >= $maxAttempts) {
+            $lastIpAttempt = static::failed()
+                ->where('ip_address', $ip)
+                ->latest('attempted_at')
+                ->first();
+            
+            if ($lastIpAttempt) {
+                $ipLockedUntil = $lastIpAttempt->attempted_at->addSeconds($lockoutSeconds);
+            }
+        }
+        
+        // Determine if locked and the reason
+        $now = now();
+        $locked = false;
+        $remainingSeconds = null;
+        $reason = null;
+        
+        // Username lockout takes priority for messaging
+        if ($usernameLockedUntil && $usernameLockedUntil->isAfter($now)) {
+            $locked = true;
+            $remainingSeconds = (int) $now->diffInSeconds($usernameLockedUntil, false);
+            $reason = 'username';
+        }
+        
+        // Check IP lockout (use whichever has longer remaining time)
+        if ($ipLockedUntil && $ipLockedUntil->isAfter($now)) {
+            $ipRemainingSeconds = (int) $now->diffInSeconds($ipLockedUntil, false);
+            if (!$locked || $ipRemainingSeconds > $remainingSeconds) {
+                $locked = true;
+                $remainingSeconds = $ipRemainingSeconds;
+                $reason = 'ip';
+            }
+        }
+        
         return [
-            'locked' => false,
-            'remaining_seconds' => null,
-            'attempts' => $failedAttempts,
+            'locked' => $locked,
+            'remaining_seconds' => $remainingSeconds,
+            'attempts' => max($usernameAttempts, $ipAttempts),
+            'reason' => $reason,
         ];
     }
 

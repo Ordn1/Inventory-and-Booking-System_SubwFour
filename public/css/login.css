@@ -83,6 +83,7 @@ button {
   background-color: #145c2a; 
   color: white;
   font-weight: bold;
+  width: 100%;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -368,4 +369,73 @@ input[type="email"] {
   background: linear-gradient(135deg, #1a8a3e, #4efc6e);
   transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(78, 252, 110, 0.3);
+}
+
+/* =============== FORM VALIDATION - DISABLED SUBMIT BUTTONS =============== */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.submit-btn-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.submit-btn-wrapper.has-tooltip {
+  cursor: not-allowed;
+}
+
+.submit-btn-wrapper.has-tooltip button:disabled {
+  pointer-events: none;
+}
+
+.submit-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #292929;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  max-width: 250px;
+  white-space: normal;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  border: 1px solid #444;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  z-index: 1000;
+  line-height: 1.4;
+}
+
+.submit-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #292929;
+}
+
+.submit-btn-wrapper.has-tooltip:hover .submit-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.submit-tooltip .tooltip-title {
+  font-weight: 600;
+  color: #ff4d4d;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.submit-tooltip .tooltip-fields {
+  color: #ccc;
 }

@@ -93,6 +93,13 @@ class IncidentResponseController extends Controller
             ->where('locked_until', '>', now())
             ->get();
 
+        // Employee Security Reports (pending/reviewing)
+        $employeeReports = \App\Models\EmployeeSecurityReport::with(['user', 'employee'])
+            ->whereIn('status', ['pending', 'reviewing'])
+            ->orderByRaw("FIELD(priority, 'critical', 'high', 'medium', 'low')")
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return view('incidents.index', compact(
             'incidents',
             'stats',
@@ -100,6 +107,7 @@ class IncidentResponseController extends Controller
             'incidentTypes',
             'timeline',
             'lockedAccounts',
+            'employeeReports',
             'status',
             'severity',
             'type',
@@ -385,5 +393,41 @@ class IncidentResponseController extends Controller
         });
 
         return round($totalMinutes / $resolved->count());
+    }
+
+    /**
+     * Acknowledge an employee security report
+     */
+    public function acknowledgeEmployeeReport(Request $request, $reportId)
+    {
+        $report = \App\Models\EmployeeSecurityReport::findOrFail($reportId);
+
+        if (!$report->isPending()) {
+            return back()->with('error', 'This report has already been processed.');
+        }
+
+        $data = $request->validate([
+            'admin_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $report->acknowledge(\Illuminate\Support\Facades\Auth::id(), $data['admin_notes'] ?? null);
+
+        return back()->with('success', 'Security report acknowledged.');
+    }
+
+    /**
+     * Resolve an employee security report
+     */
+    public function resolveEmployeeReport(Request $request, $reportId)
+    {
+        $report = \App\Models\EmployeeSecurityReport::findOrFail($reportId);
+
+        $data = $request->validate([
+            'admin_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $report->resolve(\Illuminate\Support\Facades\Auth::id(), $data['admin_notes'] ?? null);
+
+        return back()->with('success', 'Security report resolved.');
     }
 }

@@ -2214,6 +2214,173 @@ button:focus,
     background: rgba(239,68,68,.1);
 }
 
+/* Employee Incident Report Panel */
+.emp-incident-report-panel {
+    background: linear-gradient(135deg, rgba(34,34,34,.78), rgba(24,24,24,.82));
+    border: 1px solid var(--gray-300);
+    border-radius: 16px;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+.emp-reports-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-300);
+    background: linear-gradient(90deg, rgba(245,158,11,.08), transparent);
+}
+.emp-reports-title {
+    font-family: 'Raleway', sans-serif;
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.emp-reports-title i { color: #f59e0b; }
+.emp-reports-badge {
+    background: #f59e0b;
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: .75rem;
+    font-weight: 600;
+}
+.emp-reports-list { padding: 12px 20px; }
+.emp-report-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--gray-300);
+    gap: 16px;
+}
+.emp-report-item:last-child { border-bottom: none; }
+.emp-report-item.priority-critical { border-left: 3px solid var(--brand-red); padding-left: 12px; margin-left: -12px; }
+.emp-report-item.priority-high { border-left: 3px solid #f97316; padding-left: 12px; margin-left: -12px; }
+.emp-report-info { flex: 1; }
+.emp-report-header-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+.emp-report-subject {
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+.emp-report-priority {
+    font-size: .7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+.priority-badge-low { background: rgba(34,197,94,.15); color: #22c55e; }
+.priority-badge-medium { background: rgba(234,179,8,.15); color: #eab308; }
+.priority-badge-high { background: rgba(249,115,22,.15); color: #f97316; }
+.priority-badge-critical { background: rgba(239,53,53,.15); color: var(--brand-red); }
+.emp-report-user {
+    margin-bottom: 6px;
+}
+.emp-report-name {
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--gray-800);
+    margin-right: 8px;
+}
+.emp-report-email {
+    font-size: .8rem;
+    color: var(--gray-500);
+}
+.emp-report-meta {
+    display: flex;
+    gap: 16px;
+    font-size: .8rem;
+    color: var(--gray-500);
+    margin-bottom: 8px;
+}
+.emp-report-meta i { margin-right: 4px; }
+.emp-report-description {
+    font-size: .85rem;
+    color: var(--gray-600);
+    line-height: 1.5;
+}
+.emp-report-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 130px;
+}
+.btn-acknowledge {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border: none;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: .8rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: transform .2s, box-shadow .2s;
+}
+.btn-acknowledge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59,130,246,.4);
+}
+.btn-resolve {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border: none;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: .8rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: transform .2s, box-shadow .2s;
+}
+.btn-resolve:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34,197,94,.4);
+}
+
+/* Employee Dashboard Security Report Card */
+.emp-dash-security-report {
+    border-color: rgba(245,158,11,.3);
+}
+.emp-dash-security-report .emp-dash-card-header {
+    background: linear-gradient(90deg, rgba(245,158,11,.08), transparent);
+}
+.emp-dash-security-report .emp-dash-card-header h3 i {
+    color: #f59e0b;
+}
+.emp-dash-report-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: rgba(245,158,11,.05);
+    border: 1px solid rgba(245,158,11,.15);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: .85rem;
+    color: var(--gray-600);
+    line-height: 1.5;
+}
+.emp-dash-report-info i {
+    color: #f59e0b;
+    font-size: 1rem;
+    margin-top: 2px;
+}
+
 /* Stats Grid */
 .stats-grid {
     display: grid;

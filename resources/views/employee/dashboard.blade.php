@@ -292,6 +292,82 @@
             </div>
         </div>
     </div>
+
+    {{-- Security Report Section --}}
+    <div class="emp-dash-section">
+        <div class="emp-dash-card emp-dash-security-report">
+            <div class="emp-dash-card-header">
+                <h3><i class="bi bi-shield-exclamation"></i> Report a Security Issue</h3>
+            </div>
+            <div class="emp-dash-card-body">
+                <p class="emp-dash-report-info">
+                    <i class="bi bi-info-circle"></i>
+                    If you notice any suspicious activity, security concerns, or system issues, please report them here. 
+                    The security team will review and respond to your report.
+                </p>
+                <button type="button" class="btn btn-warning" onclick="openSecurityReportModal()">
+                    <i class="bi bi-flag"></i> Submit Security Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Security Report Modal --}}
+<div id="securityReportModal" class="app-modal">
+    <div class="app-modal-content emp-dash-modal">
+        <div class="emp-dash-modal-header">
+            <h3><i class="bi bi-shield-exclamation"></i> Submit Security Report</h3>
+            <button type="button" class="emp-modal-close" onclick="closeSecurityReportModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <form action="{{ route('employee.security-report') }}" method="POST">
+            @csrf
+            <div class="emp-dash-modal-body">
+                <p class="emp-dash-modal-info">
+                    <i class="bi bi-info-circle"></i>
+                    Describe the security issue you've observed. Include as much detail as possible 
+                    to help the security team investigate.
+                </p>
+                <div class="emp-form-group">
+                    <label>Subject <span style="color: var(--brand-red);">*</span></label>
+                    <input type="text" name="subject" required maxlength="255" 
+                           placeholder="Brief description of the issue">
+                </div>
+                <div class="emp-form-group">
+                    <label>Category <span style="color: var(--brand-red);">*</span></label>
+                    <select name="category" required>
+                        <option value="suspicious_activity">Suspicious Activity</option>
+                        <option value="unauthorized_access">Unauthorized Access</option>
+                        <option value="data_breach">Potential Data Breach</option>
+                        <option value="system_issue">System Issue</option>
+                        <option value="general" selected>General Security Concern</option>
+                    </select>
+                </div>
+                <div class="emp-form-group">
+                    <label>Priority <span style="color: var(--brand-red);">*</span></label>
+                    <select name="priority" required>
+                        <option value="low">Low - Minor concern</option>
+                        <option value="medium" selected>Medium - Should be reviewed</option>
+                        <option value="high">High - Urgent attention needed</option>
+                        <option value="critical">Critical - Immediate action required</option>
+                    </select>
+                </div>
+                <div class="emp-form-group">
+                    <label>Description <span style="color: var(--brand-red);">*</span></label>
+                    <textarea name="description" rows="5" required maxlength="2000" 
+                              placeholder="Provide detailed information about what you observed, when it happened, and any other relevant details..."></textarea>
+                </div>
+            </div>
+            <div class="emp-dash-modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeSecurityReportModal()">Cancel</button>
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-send"></i> Submit Report
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 {{-- Password Change Request Modal --}}
@@ -423,6 +499,16 @@ function closePasswordChangeModal() {
     document.getElementById('passwordChangeErrors').style.display = 'none';
 }
 
+function openSecurityReportModal() {
+    document.getElementById('securityReportModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeSecurityReportModal() {
+    document.getElementById('securityReportModal').classList.remove('show');
+    document.body.style.overflow = '';
+}
+
 function toggleModalPassword(inputId, btn) {
     const input = document.getElementById(inputId);
     const icon = btn.querySelector('i');
@@ -444,12 +530,16 @@ document.getElementById('passwordRequestModal')?.addEventListener('click', funct
 document.getElementById('passwordChangeModal')?.addEventListener('click', function(e) {
     if (e.target === this) closePasswordChangeModal();
 });
+document.getElementById('securityReportModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeSecurityReportModal();
+});
 
 // Close on ESC
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closePasswordRequestModal();
         closePasswordChangeModal();
+        closeSecurityReportModal();
     }
 });
 

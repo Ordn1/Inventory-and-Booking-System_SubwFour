@@ -65,6 +65,7 @@ Route::middleware(['auth', 'role:employee'])->prefix('employee')->group(function
     Route::get('/dashboard', [EmployeeDashboardController::class, 'index'])->name('employee.dashboard');
     Route::post('/password-change-request', [EmployeeDashboardController::class, 'requestPasswordChange'])->name('employee.password-request');
     Route::delete('/password-change-request', [EmployeeDashboardController::class, 'cancelPasswordRequest'])->name('employee.password-request.cancel');
+    Route::post('/security-report', [EmployeeDashboardController::class, 'submitSecurityReport'])->name('employee.security-report');
 });
 
 /*
@@ -178,6 +179,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/lock-account/{user}',       [\App\Http\Controllers\IncidentResponseController::class, 'lockAccount'])->name('incidents.lock-account');
         Route::post('/unlock-account/{user}',     [\App\Http\Controllers\IncidentResponseController::class, 'unlockAccount'])->name('incidents.unlock-account');
         Route::post('/force-password/{user}',     [\App\Http\Controllers\IncidentResponseController::class, 'forcePasswordReset'])->name('incidents.force-password');
+        Route::post('/employee-report/{report}/acknowledge', [\App\Http\Controllers\IncidentResponseController::class, 'acknowledgeEmployeeReport'])->name('incidents.employee-report.acknowledge');
+        Route::post('/employee-report/{report}/resolve', [\App\Http\Controllers\IncidentResponseController::class, 'resolveEmployeeReport'])->name('incidents.employee-report.resolve');
     });
 
     // System Logs (Admin & Security)

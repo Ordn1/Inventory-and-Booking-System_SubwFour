@@ -91,6 +91,63 @@
     </div>
 </div>
 
+{{-- Employee Security Reports Panel --}}
+@if(isset($employeeReports) && count($employeeReports) > 0)
+<div class="emp-incident-report-panel">
+    <div class="emp-reports-header">
+        <h3 class="emp-reports-title">
+            <i class="bi bi-flag"></i> Employee Security Reports
+            <span class="emp-reports-badge">{{ count($employeeReports) }}</span>
+        </h3>
+    </div>
+    <div class="emp-reports-list">
+        @foreach($employeeReports as $report)
+            @php
+                $reportEmployee = $report->employee;
+                $reportUser = $report->user;
+                $reportName = $reportEmployee ? ($reportEmployee->first_name . ' ' . $reportEmployee->last_name) : ($reportUser->name ?? 'Unknown');
+                $reportEmail = $reportUser->email ?? '—';
+            @endphp
+            <div class="emp-report-item priority-{{ $report->priority }}">
+                <div class="emp-report-info">
+                    <div class="emp-report-header-row">
+                        <span class="emp-report-subject">{{ $report->subject }}</span>
+                        <span class="emp-report-priority priority-badge-{{ $report->priority }}">{{ ucfirst($report->priority) }}</span>
+                    </div>
+                    <div class="emp-report-user">
+                        <span class="emp-report-name">{{ $reportName }}</span>
+                        <span class="emp-report-email">{{ $reportEmail }}</span>
+                    </div>
+                    <div class="emp-report-meta">
+                        <span class="emp-report-category">
+                            <i class="bi bi-tag"></i> {{ str_replace('_', ' ', ucfirst($report->category)) }}
+                        </span>
+                        <span class="emp-report-date">
+                            <i class="bi bi-clock"></i> {{ $report->created_at->diffForHumans() }}
+                        </span>
+                    </div>
+                    <div class="emp-report-description">
+                        {{ Str::limit($report->description, 150) }}
+                    </div>
+                </div>
+                <div class="emp-report-actions">
+                    <form action="{{ route('incidents.employee-report.acknowledge', $report->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-acknowledge btn-sm" title="Acknowledge">
+                            <i class="bi bi-check-lg"></i> Acknowledge
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-resolve btn-sm" 
+                            onclick="openResolveReportModal({{ $report->id }}, '{{ e($report->subject) }}')" title="Resolve">
+                        <i class="bi bi-check-circle"></i> Resolve
+                    </button>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
 <div class="incident-layout">
     <!-- Main Content -->
     <div class="incident-main">
@@ -310,6 +367,36 @@
                 </button>
             </form>
         </div>
+    </div>
+</div>
+
+{{-- Resolve Employee Report Modal --}}
+<div id="resolveReportModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="bi bi-check-circle"></i> Resolve Security Report</h3>
+            <button type="button" class="modal-close" onclick="closeResolveReportModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="resolveReportForm" method="POST">
+            @csrf
+            <div class="modal-body">
+                <p class="modal-info">
+                    <strong>Report:</strong> <span id="resolveReportSubject"></span>
+                </p>
+                <div class="form-group">
+                    <label>Resolution Notes (optional)</label>
+                    <textarea name="admin_notes" rows="4" placeholder="Describe the resolution or actions taken..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeResolveReportModal()">Cancel</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-check"></i> Resolve Report
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -654,5 +741,20 @@
             bulkActions.style.display = 'none';
         }
     }
+
+    function openResolveReportModal(reportId, subject) {
+        document.getElementById('resolveReportSubject').textContent = subject;
+        document.getElementById('resolveReportForm').action = '/incidents/employee-report/' + reportId + '/resolve';
+        document.getElementById('resolveReportModal').style.display = 'flex';
+    }
+
+    function closeResolveReportModal() {
+        document.getElementById('resolveReportModal').style.display = 'none';
+        document.getElementById('resolveReportForm').reset();
+    }
+
+    document.getElementById('resolveReportModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeResolveReportModal();
+    });
 </script>
 @endsection

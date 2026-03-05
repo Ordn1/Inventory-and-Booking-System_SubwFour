@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Employee;
+use App\Models\EmployeeSecurityReport;
 use App\Models\Item;
 use App\Models\LoginAttempt;
 use App\Models\PasswordChangeRequest;
@@ -303,5 +304,37 @@ class EmployeeDashboardController extends Controller
         $passwordRequest->reject(Auth::id(), $data['admin_comments'] ?? null);
 
         return back()->with('success', 'Password change request rejected.');
+    }
+
+    /**
+     * Submit a security report
+     */
+    public function submitSecurityReport(Request $request)
+    {
+        $user = Auth::user();
+        $employee = $user->employee;
+
+        if (!$employee) {
+            return back()->with('error', 'Employee profile not found.');
+        }
+
+        $data = $request->validate([
+            'subject' => 'required|string|max:255',
+            'description' => 'required|string|max:2000',
+            'category' => 'required|in:suspicious_activity,unauthorized_access,data_breach,system_issue,general',
+            'priority' => 'required|in:low,medium,high,critical',
+        ]);
+
+        EmployeeSecurityReport::create([
+            'user_id' => $user->id,
+            'employee_id' => $employee->id,
+            'subject' => $data['subject'],
+            'description' => $data['description'],
+            'category' => $data['category'],
+            'priority' => $data['priority'],
+            'status' => 'pending',
+        ]);
+
+        return back()->with('success', 'Security report submitted successfully. The security team will review it shortly.');
     }
 }

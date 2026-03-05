@@ -83,6 +83,67 @@
     const captchaError = document.getElementById('captcha-error');
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+    // ============ Empty Field Validation ============
+    function initFormValidation(form) {
+      const requiredFields = form.querySelectorAll('[required]');
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (!submitBtn || requiredFields.length === 0) return;
+
+      function getFieldLabel(field) {
+        const id = field.id;
+        if (id) {
+          const label = document.querySelector(`label[for="${id}"]`);
+          if (label) return label.textContent.replace(/[:\s*]+$/g, '').trim();
+        }
+        if (field.placeholder) return field.placeholder;
+        if (field.name) return field.name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        return 'Required field';
+      }
+
+      function getEmptyFields() {
+        return Array.from(requiredFields).filter(f => !f.value.trim());
+      }
+
+      function updateSubmitState() {
+        const emptyFields = getEmptyFields();
+        const hasEmpty = emptyFields.length > 0;
+        submitBtn.disabled = hasEmpty;
+
+        let wrapper = submitBtn.parentElement;
+        if (!wrapper.classList.contains('submit-btn-wrapper')) {
+          wrapper = document.createElement('div');
+          wrapper.className = 'submit-btn-wrapper';
+          wrapper.style.cssText = 'position:relative;display:inline-block;width:100%;';
+          submitBtn.parentNode.insertBefore(wrapper, submitBtn);
+          wrapper.appendChild(submitBtn);
+          
+          const tooltip = document.createElement('div');
+          tooltip.className = 'submit-tooltip';
+          wrapper.appendChild(tooltip);
+        }
+
+        if (hasEmpty) {
+          wrapper.classList.add('has-tooltip');
+          const tooltip = wrapper.querySelector('.submit-tooltip');
+          if (tooltip) {
+            const names = emptyFields.map(f => getFieldLabel(f));
+            tooltip.innerHTML = `<span class="tooltip-title">Please fill in:</span><span class="tooltip-fields">${names.join(', ')}</span>`;
+          }
+        } else {
+          wrapper.classList.remove('has-tooltip');
+        }
+      }
+
+      updateSubmitState();
+      requiredFields.forEach(field => {
+        field.addEventListener('input', updateSubmitState);
+        field.addEventListener('change', updateSubmitState);
+      });
+    }
+
+    // Initialize validation for login form
+    initFormValidation(loginForm);
+
     // Handle login form submission
     loginForm.addEventListener('submit', async function(e) {
       e.preventDefault();
